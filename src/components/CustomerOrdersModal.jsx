@@ -156,6 +156,9 @@ export default function CustomerOrdersModal({ isOpen, onClose, orders, currentUs
                       <div>
                         <strong>Kujdes: Porosia juaj po vjen!</strong>
                         <p>Korrieri i MaxMarket është rrugës drejt adresës: <b>{order.address}, {order.city}</b>. Mbani telefonin hapur ({order.phone}).</p>
+                        {order.transportCompany && (
+                          <p className="transport-info-client">🚚 Transportohet nga: <strong>{order.transportCompany}</strong></p>
+                        )}
                       </div>
                     </div>
                   )}

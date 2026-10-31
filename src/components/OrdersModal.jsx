@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { X, Package, Clock, CheckCircle2, Phone, Mail, MapPin, Trash2, Calendar, Filter, Truck } from 'lucide-react';
 
-export default function OrdersModal({ isOpen, onClose, orders, onUpdateStatus, onDeleteOrder }) {
+const TRANSPORT_COMPANIES = [
+  { value: '', label: '— Zgjidh Kompaninë —' },
+  { value: 'Posta', label: '🏛️ Posta' },
+  { value: 'Mikmik', label: '🚐 Mikmik' },
+  { value: 'Posta e shpejtë', label: '⚡ Posta e shpejtë' },
+  { value: 'PostaCheetah', label: '🐆 PostaCheetah' },
+];
+
+export default function OrdersModal({ isOpen, onClose, orders, onUpdateStatus, onDeleteOrder, onUpdateTransport }) {
   const [filterStatus, setFilterStatus] = useState('pending');
 
   if (!isOpen) return null;
@@ -197,6 +205,25 @@ export default function OrdersModal({ isOpen, onClose, orders, onUpdateStatus, o
                         </div>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Transport Company Selector (Admin) */}
+                  <div className="transport-selector-row">
+                    <label className="transport-label">
+                      <Truck size={14} /> Kompania e Transportit:
+                    </label>
+                    <select
+                      className="transport-company-select"
+                      value={order.transportCompany || ''}
+                      onChange={(e) => onUpdateTransport(order.orderId, e.target.value)}
+                    >
+                      {TRANSPORT_COMPANIES.map((c) => (
+                        <option key={c.value} value={c.value}>{c.label}</option>
+                      ))}
+                    </select>
+                    {order.transportCompany && (
+                      <span className="transport-saved-badge">✓ Ruajtur</span>
+                    )}
                   </div>
 
                   {/* Order Footer with Total */}

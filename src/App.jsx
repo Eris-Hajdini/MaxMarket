@@ -202,6 +202,13 @@ function App() {
     setOrders((prev) => prev.filter((o) => o.orderId !== orderId));
   };
 
+  // Admin sets transport company for order
+  const handleUpdateTransport = (orderId, company) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.orderId === orderId ? { ...o, transportCompany: company } : o))
+    );
+  };
+
   // Filter products by category
   const filteredProducts = activeCategory === 'all'
     ? productsList
@@ -464,6 +471,7 @@ function App() {
         orders={orders}
         onUpdateStatus={handleUpdateOrderStatus}
         onDeleteOrder={handleDeleteOrder}
+        onUpdateTransport={handleUpdateTransport}
       />
 
       {/* Customer Orders Tracking Modal */}

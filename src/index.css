@@ -3643,6 +3643,68 @@ body {
   color: var(--primary);
 }
 
+/* ── Transport Company Selector (Admin Orders) ── */
+.transport-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border: 1.5px dashed #dee2e6;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.transport-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.transport-company-select {
+  flex: 1;
+  min-width: 160px;
+  padding: 6px 10px;
+  border: 1.5px solid #ced4da;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.transport-company-select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.transport-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #d3f9d8;
+  color: #2b8a3e;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+/* Transport info shown to customer */
+.transport-info-client {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #d9480f;
+}
+
 .orders-empty-state {
   text-align: center;
   padding: 50px 20px;
