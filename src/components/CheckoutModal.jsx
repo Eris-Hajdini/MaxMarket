@@ -84,9 +84,20 @@ export default function CheckoutModal({ isOpen, onClose, cart, onOrderPlaced }) 
                 <strong>€{total.toFixed(2)}</strong>
               </div>
             </div>
-            <button className="done-btn" onClick={onClose}>
-              Kthehu në Dyqan
-            </button>
+            <div className="success-actions-row">
+              <button className="view-my-order-btn" onClick={() => {
+                onClose();
+                if (window.openCustomerOrdersModal) {
+                  window.openCustomerOrdersModal();
+                }
+              }}>
+                <Package size={17} />
+                <span>Shiko Porosinë Time (Në Pritje)</span>
+              </button>
+              <button className="done-btn" onClick={onClose}>
+                Kthehu në Dyqan
+              </button>
+            </div>
           </div>
         ) : (
           <div className="checkout-form-container">

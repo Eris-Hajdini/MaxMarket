@@ -179,6 +179,21 @@ function App() {
 
     setOrders((prev) => [newOrder, ...prev]);
     setCart([]); // Clear bucket after successful order
+
+    // Automatically log in customer if not logged in so they can see their order
+    if (!currentUser) {
+      setCurrentUser({
+        name: orderData.name,
+        email: orderData.email,
+        role: 'client'
+      });
+    }
+
+    // Automatically open Customer Orders modal so they immediately see their order in "Në Pritje"
+    setTimeout(() => {
+      setIsCheckoutOpen(false);
+      setIsCustomerOrdersOpen(true);
+    }, 1800);
   };
 
   // Admin toggles order status: 'pending', 'on_the_way', 'completed'

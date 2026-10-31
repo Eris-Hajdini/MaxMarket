@@ -1,13 +1,27 @@
-import React from 'react';
-import { X, Truck, Package, Clock, CheckCircle2, MapPin, Calendar } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Truck, Package, Clock, CheckCircle2, MapPin, Calendar, Filter } from 'lucide-react';
 
 export default function CustomerOrdersModal({ isOpen, onClose, orders, currentUser }) {
+  const [filterStatus, setFilterStatus] = useState('all');
+
   if (!isOpen) return null;
 
   // Filter orders matching ONLY current logged in client email
-  const displayOrders = currentUser
+  const userOrders = currentUser
     ? orders.filter((o) => o.email?.toLowerCase() === currentUser.email?.toLowerCase())
     : [];
+
+  const onTheWayOrders = userOrders.filter((o) => o.status === 'on_the_way');
+  const completedOrders = userOrders.filter((o) => o.status === 'completed');
+  const pendingOrders = userOrders.filter((o) => o.status === 'pending');
+
+  const displayOrders = filterStatus === 'all'
+    ? userOrders
+    : filterStatus === 'on_the_way'
+      ? onTheWayOrders
+      : filterStatus === 'completed'
+        ? completedOrders
+        : pendingOrders;
 
   return (
     <div className="add-product-backdrop" onClick={onClose}>
@@ -21,15 +35,58 @@ export default function CustomerOrdersModal({ isOpen, onClose, orders, currentUs
             <Package size={15} /> Porositë e Mia
           </div>
           <h2>Gjurmo Porositë Tuaja</h2>
-          <p>Këtu mund të shihni statusin në kohë reale të dërgesave tuaja nga MaxMarket.</p>
+          <p>Filtroni dhe ndiqni statusin e dërgesave tuaja nga MaxMarket.</p>
+
+          {/* Customer Orders Filter Tabs */}
+          <div className="orders-status-tabs client-filter-tabs">
+            <button
+              className={`status-tab-btn ${filterStatus === 'all' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('all')}
+            >
+              <Filter size={13} />
+              <span>Të Gjitha ({userOrders.length})</span>
+            </button>
+
+            <button
+              className={`status-tab-btn on-the-way ${filterStatus === 'on_the_way' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('on_the_way')}
+            >
+              <Truck size={13} />
+              <span>Rrugës ({onTheWayOrders.length})</span>
+            </button>
+
+            <button
+              className={`status-tab-btn completed ${filterStatus === 'completed' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('completed')}
+            >
+              <CheckCircle2 size={13} />
+              <span>Të Kompletuara ({completedOrders.length})</span>
+            </button>
+
+            <button
+              className={`status-tab-btn pending ${filterStatus === 'pending' ? 'active' : ''}`}
+              onClick={() => setFilterStatus('pending')}
+            >
+              <Clock size={13} />
+              <span>Në Përgatitje ({pendingOrders.length})</span>
+            </button>
+          </div>
         </div>
 
         <div className="customer-orders-body">
           {displayOrders.length === 0 ? (
             <div className="customer-no-orders">
               <Package size={48} className="empty-box-icon" />
-              <h3>Nuk keni asnjë porosi aktive</h3>
-              <p>Kur të bëni një porosi, mund ta ndiqni statusin e dërgesës këtu.</p>
+              <h3>
+                {filterStatus === 'on_the_way'
+                  ? 'Nuk keni asnjë porosi që është rrugës aktualisht'
+                  : filterStatus === 'completed'
+                    ? 'Nuk keni asnjë porosi të kompletuar'
+                    : filterStatus === 'pending'
+                      ? 'Nuk keni asnjë porosi në përgatitje'
+                      : 'Nuk keni asnjë porosi të regjistruar'}
+              </h3>
+              <p>Kur bëni porosi në dyqan, statusi i tyre do të përditësohet në kohë reale këtu.</p>
             </div>
           ) : (
             displayOrders.map((order) => {
