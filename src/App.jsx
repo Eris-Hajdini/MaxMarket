@@ -137,6 +137,14 @@ function App() {
         const el = document.getElementById('products-section');
         if (el) el.scrollIntoView({ behavior: 'smooth' });
       }, 300);
+    } else {
+      // If cart has items, go directly to checkout after login
+      setCart((prevCart) => {
+        if (prevCart.length > 0) {
+          setTimeout(() => setIsCheckoutOpen(true), 200);
+        }
+        return prevCart;
+      });
     }
   };
 
@@ -451,7 +459,14 @@ function App() {
         cart={cart}
         onUpdateQuantity={handleUpdateQuantity}
         onRemove={handleRemoveFromCart}
-        onProceedToCheckout={() => setIsCheckoutOpen(true)}
+        onProceedToCheckout={() => {
+          if (!currentUser) {
+            setIsCartOpen(false);
+            setIsAuthOpen(true);
+          } else {
+            setIsCheckoutOpen(true);
+          }
+        }}
       />
 
       {/* Checkout Modal Form (Customer details) */}
