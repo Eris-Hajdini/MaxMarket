@@ -1,17 +1,25 @@
-import React, { useState } from 'react';
-import { X, CheckCircle, ShieldCheck, Truck, ShoppingBag, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, CheckCircle, Truck, Package, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function CheckoutModal({ isOpen, onClose, cart, onOrderPlaced }) {
+export default function CheckoutModal({ isOpen, onClose, cart, currentUser, onOrderPlaced, onViewMyOrders }) {
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('Prishtinë');
-  const [paymentMethod, setPaymentMethod] = useState('cod'); // cod = Cash on Delivery
+  const [paymentMethod, setPaymentMethod] = useState('cod');
   const [isSuccess, setIsSuccess] = useState(false);
-  const [orderId, setOrderId] = useState('');
+  const [createdOrder, setCreatedOrder] = useState(null);
+
+  // Auto-fill customer info if logged in
+  useEffect(() => {
+    if (currentUser && currentUser.role !== 'admin') {
+      if (currentUser.name && !name) setName(currentUser.name);
+      if (currentUser.email && !email) setEmail(currentUser.email);
+    }
+  }, [currentUser, isOpen]);
 
   if (!isOpen) return null;
 
@@ -21,13 +29,28 @@ export default function CheckoutModal({ isOpen, onClose, cart, onOrderPlaced }) 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !surname || !email || !phone || !address) {
+    if (!name.trim() || !surname.trim() || !email.trim() || !phone.trim() || !address.trim()) {
       alert("Ju lutem plotësoni të gjitha fushat e kërkuara!");
       return;
     }
 
     const newOrderId = 'MAX-' + Math.floor(100000 + Math.random() * 900000);
-    setOrderId(newOrderId);
+    const orderData = {
+      orderId: newOrderId,
+      name: name.trim(),
+      surname: surname.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      city,
+      items: [...cart],
+      total,
+      paymentMethod
+    };
+
+    // Save order immediately into state & localStorage
+    onOrderPlaced(orderData);
+    setCreatedOrder(orderData);
     setIsSuccess(true);
 
     try {
@@ -37,26 +60,25 @@ export default function CheckoutModal({ isOpen, onClose, cart, onOrderPlaced }) 
         origin: { y: 0.5 }
       });
     } catch (err) {}
+  };
 
-    setTimeout(() => {
-      onOrderPlaced({
-        orderId: newOrderId,
-        name,
-        surname,
-        email,
-        phone,
-        address,
-        city,
-        items: cart,
-        total
-      });
-    }, 2500);
+  const handleReturnToWebsite = () => {
+    setIsSuccess(false);
+    onClose();
+  };
+
+  const handleGoToMyOrders = () => {
+    setIsSuccess(false);
+    onClose();
+    if (onViewMyOrders) {
+      onViewMyOrders();
+    }
   };
 
   return (
-    <div className="checkout-backdrop" onClick={onClose}>
+    <div className="checkout-backdrop" onClick={handleReturnToWebsite}>
       <div className="checkout-modal-card" onClick={(e) => e.stopPropagation()}>
-        <button className="auth-close-btn" onClick={onClose}>
+        <button className="auth-close-btn" onClick={handleReturnToWebsite}>
           <X size={20} />
         </button>
 
@@ -66,10 +88,11 @@ export default function CheckoutModal({ isOpen, onClose, cart, onOrderPlaced }) 
               <CheckCircle size={64} color="#2b8a3e" />
             </div>
             <h2>Porosia u Konfirmua me Sukses!</h2>
-            <p className="order-code-badge">Numri i Porosisë: <strong>{orderId}</strong></p>
+            <p className="order-code-badge">Numri i Porosisë: <strong>{createdOrder?.orderId}</strong></p>
             <p className="success-sub">
-              Faleminderit <strong>{name} {surname}</strong>! Një konfirmim dhe faturë u dërgua në emailin <strong>{email}</strong>.
+              Faleminderit <strong>{name} {surname}</strong>! Porosia juaj u regjistrua me sukses dhe është ruajtur në llogarinë tuaj.
             </p>
+
             <div className="success-details-summary">
               <div className="summary-line">
                 <span>📍 Adresa e dorëzimit:</span>
@@ -80,21 +103,17 @@ export default function CheckoutModal({ isOpen, onClose, cart, onOrderPlaced }) 
                 <strong>{phone}</strong>
               </div>
               <div className="summary-line">
-                <span>💵 Totali për pagesë (Cash):</span>
+                <span>💵 Totali për pagesë:</span>
                 <strong>€{total.toFixed(2)}</strong>
               </div>
             </div>
+
             <div className="success-actions-row">
-              <button className="view-my-order-btn" onClick={() => {
-                onClose();
-                if (window.openCustomerOrdersModal) {
-                  window.openCustomerOrdersModal();
-                }
-              }}>
+              <button className="view-my-order-btn" onClick={handleGoToMyOrders}>
                 <Package size={17} />
-                <span>Shiko Porosinë Time (Në Pritje)</span>
+                <span>Shiko tek Porositë e Mia</span>
               </button>
-              <button className="done-btn" onClick={onClose}>
+              <button className="done-btn" onClick={handleReturnToWebsite}>
                 Kthehu në Dyqan
               </button>
             </div>

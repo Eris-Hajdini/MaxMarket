@@ -162,7 +162,7 @@ function App() {
     setCart((prev) => prev.filter((item) => item.id !== productId));
   };
 
-  // Customer places order -> Save to orders list with timestamp & status 'pending'
+  // Customer places order -> Save immediately to orders list with timestamp & status 'pending'
   const handleOrderPlaced = (orderData) => {
     const formattedDate = new Date().toLocaleDateString('sq-AL', {
       day: 'numeric',
@@ -180,7 +180,7 @@ function App() {
     setOrders((prev) => [newOrder, ...prev]);
     setCart([]); // Clear bucket after successful order
 
-    // Automatically log in customer if not logged in so they can see their order
+    // If client wasn't logged in, log them in automatically with the email they provided
     if (!currentUser) {
       setCurrentUser({
         name: orderData.name,
@@ -188,12 +188,6 @@ function App() {
         role: 'client'
       });
     }
-
-    // Automatically open Customer Orders modal so they immediately see their order in "Në Pritje"
-    setTimeout(() => {
-      setIsCheckoutOpen(false);
-      setIsCustomerOrdersOpen(true);
-    }, 1800);
   };
 
   // Admin toggles order status: 'pending', 'on_the_way', 'completed'
@@ -458,7 +452,9 @@ function App() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         cart={cart}
+        currentUser={currentUser}
         onOrderPlaced={handleOrderPlaced}
+        onViewMyOrders={() => setIsCustomerOrdersOpen(true)}
       />
 
       {/* Admin Orders Modal (Porositë) */}
