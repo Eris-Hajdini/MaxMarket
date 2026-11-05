@@ -7,14 +7,8 @@ import {
   Users,
   Tag,
   Boxes,
-  BarChart3,
   Settings,
-  Store,
-  MessageSquare,
-  Headphones,
   LogOut,
-  Search,
-  Bell,
   Calendar,
   ChevronDown,
   TrendingUp,
@@ -24,11 +18,12 @@ import {
   Trash2,
   Edit3,
   PlusCircle,
-  Eye,
-  ExternalLink,
   MoreHorizontal,
   X,
-  Menu
+  Menu,
+  Sparkles,
+  BarChart3,
+  Plus
 } from 'lucide-react';
 import '../admin.css';
 
@@ -51,18 +46,22 @@ export default function AdminDashboard({
   onAddProduct,
   onEditProduct,
   onDeleteProduct,
-  onViewStore,
+  onAddCategory,
   onLogout
 }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTimeframe, setSelectedTimeframe] = useState('30D');
   const [selectedOrderForAction, setSelectedOrderForAction] = useState(null);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [dateRange, setDateRange] = useState('Oct 1 – Oct 31, 2026');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+
+  // Categories modal state
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
+  const [newCatIcon, setNewCatIcon] = useState('Sparkles');
+  const [newCatBadge, setNewCatBadge] = useState('');
 
   // Search filter for dedicated tabs
   const [productSearch, setProductSearch] = useState('');
@@ -124,19 +123,6 @@ export default function AdminDashboard({
     }
   ];
 
-  // Global search across orders and products
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return null;
-    const q = searchQuery.toLowerCase();
-    const matchedProducts = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
-    const matchedOrders = orders.filter(o =>
-      o.orderId.toLowerCase().includes(q) ||
-      (o.name + ' ' + o.surname).toLowerCase().includes(q) ||
-      o.city?.toLowerCase().includes(q)
-    );
-    return { products: matchedProducts, orders: matchedOrders };
-  }, [searchQuery, products, orders]);
-
   // Handle order status update
   const handleSetOrderStatus = (orderId, newStatus) => {
     onUpdateStatus(orderId, newStatus);
@@ -151,6 +137,29 @@ export default function AdminDashboard({
     if (selectedOrderForAction && selectedOrderForAction.orderId === orderId) {
       setSelectedOrderForAction(prev => ({ ...prev, transportCompany: company }));
     }
+  };
+
+  // Handle Add Category Submit
+  const handleCreateCategory = (e) => {
+    e.preventDefault();
+    if (!newCatName.trim()) return;
+
+    const id = newCatName.trim().toLowerCase().replace(/\s+/g, '-');
+    const newCategory = {
+      id,
+      name: newCatName.trim(),
+      icon: newCatIcon,
+      count: 0,
+      badge: newCatBadge.trim() || null
+    };
+
+    if (onAddCategory) {
+      onAddCategory(newCategory);
+    }
+
+    setNewCatName('');
+    setNewCatBadge('');
+    setIsAddCategoryOpen(false);
   };
 
   return (
@@ -173,7 +182,7 @@ export default function AdminDashboard({
           </div>
         </div>
 
-        {/* Navigation Items */}
+        {/* Navigation Items (Cleaned as requested) */}
         <nav className="admin-sidebar-nav">
           <button
             className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
@@ -248,16 +257,6 @@ export default function AdminDashboard({
           </button>
 
           <button
-            className={`admin-nav-item ${activeTab === 'reports' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('reports'); setSidebarOpen(false); }}
-          >
-            <div className="nav-item-left">
-              <BarChart3 size={19} />
-              <span>Reports</span>
-            </div>
-          </button>
-
-          <button
             className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => { setActiveTab('settings'); setSidebarOpen(false); }}
           >
@@ -266,48 +265,10 @@ export default function AdminDashboard({
               <span>Settings</span>
             </div>
           </button>
-
-          <div className="admin-sidebar-divider" />
-
-          <button
-            className={`admin-nav-item ${activeTab === 'sellers' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('sellers'); setSidebarOpen(false); }}
-          >
-            <div className="nav-item-left">
-              <Store size={19} />
-              <span>Sellers</span>
-            </div>
-          </button>
-
-          <button
-            className={`admin-nav-item ${activeTab === 'messages' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('messages'); setSidebarOpen(false); }}
-          >
-            <div className="nav-item-left">
-              <MessageSquare size={19} />
-              <span>Messages</span>
-            </div>
-            <span className="nav-badge-pill">0</span>
-          </button>
-
-          <button
-            className={`admin-nav-item ${activeTab === 'support' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('support'); setSidebarOpen(false); }}
-          >
-            <div className="nav-item-left">
-              <Headphones size={19} />
-              <span>Support</span>
-            </div>
-          </button>
         </nav>
 
-        {/* Sidebar Footer with Store Preview & Logout */}
+        {/* Sidebar Footer with Logout only */}
         <div className="admin-sidebar-footer">
-          <button className="view-store-btn" onClick={onViewStore} title="Shiko Dyqanin (Customer Storefront)">
-            <span>Dyqani MaxMarket</span>
-            <ExternalLink size={15} />
-          </button>
-
           <button className="admin-nav-item logout-nav-item" onClick={onLogout}>
             <div className="nav-item-left">
               <LogOut size={18} />
@@ -319,7 +280,7 @@ export default function AdminDashboard({
 
       {/* ── Main Content Area ── */}
       <div className="admin-main-wrapper">
-        {/* Top Header Bar */}
+        {/* Top Header Bar (Search bar, Shiko Dyqanin & Bell removed) */}
         <header className="admin-topbar">
           <div className="admin-topbar-left">
             <button
@@ -329,116 +290,9 @@ export default function AdminDashboard({
             >
               <Menu size={22} />
             </button>
-
-            {/* Search Box */}
-            <div className="admin-search-box">
-              <Search size={18} color="#94a3b8" />
-              <input
-                type="text"
-                placeholder="Search anything... (Ctrl + K)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
-                >
-                  <X size={15} />
-                </button>
-              )}
-
-              {/* Live search results overlay */}
-              {searchResults && (
-                <div className="search-results-dropdown">
-                  <div className="search-section-title">Produktet ({searchResults.products.length})</div>
-                  {searchResults.products.slice(0, 3).map((p) => (
-                    <div
-                      key={p.id}
-                      className="search-result-item"
-                      onClick={() => {
-                        setActiveTab('products');
-                        setSearchQuery('');
-                        onEditProduct(p);
-                      }}
-                    >
-                      <div className="search-item-left">
-                        <img src={p.image} alt={p.name} className="search-item-thumb" />
-                        <div>
-                          <strong>{p.name}</strong>
-                          <div style={{ fontSize: '0.76rem', color: '#64748b' }}>€{p.price.toFixed(2)}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="search-section-title">Porositë ({searchResults.orders.length})</div>
-                  {searchResults.orders.slice(0, 3).map((o) => (
-                    <div
-                      key={o.orderId}
-                      className="search-result-item"
-                      onClick={() => {
-                        setSelectedOrderForAction(o);
-                        setSearchQuery('');
-                      }}
-                    >
-                      <div className="search-item-left">
-                        <Package size={16} color="#2563eb" />
-                        <div>
-                          <strong>{o.orderId}</strong> — {o.name} {o.surname}
-                          <div style={{ fontSize: '0.76rem', color: '#64748b' }}>Totali: €{Number(o.total || 0).toFixed(2)}</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="admin-topbar-right">
-            {/* View storefront pill */}
-            <button className="store-quick-pill" onClick={onViewStore} title="Shiko Dyqanin e Klientëve">
-              <Eye size={16} />
-              <span>Shiko Dyqanin</span>
-            </button>
-
-            {/* Notification Bell */}
-            <button
-              className="notif-bell-btn"
-              onClick={() => setShowNotifications(!showNotifications)}
-              title="Njoftimet"
-            >
-              <Bell size={20} />
-              {orders.length > 0 && <span className="notif-badge">{orders.length}</span>}
-            </button>
-
-            {showNotifications && (
-              <div className="notifications-dropdown">
-                <div className="notif-header">
-                  <h4>Njoftimet e Dyqanit</h4>
-                  <span style={{ fontSize: '0.75rem', color: '#2563eb', cursor: 'pointer' }}>Shëno të lexuara</span>
-                </div>
-                {orders.length === 0 ? (
-                  <p style={{ fontSize: '0.82rem', color: '#64748b', textAlign: 'center', margin: '14px 0' }}>
-                    Nuk ka asnjë njoftim të ri.
-                  </p>
-                ) : (
-                  orders.slice(0, 3).map((o) => (
-                    <div key={o.orderId} className="notif-item">
-                      <div className="notif-dot" />
-                      <div>
-                        <strong style={{ fontSize: '0.85rem' }}>Porosi e re {o.orderId}</strong>
-                        <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>
-                          Klienti {o.name} {o.surname} porositi €{Number(o.total).toFixed(2)}.
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
             {/* Admin Avatar Profile */}
             <div
               className="admin-profile-pill"
@@ -453,9 +307,6 @@ export default function AdminDashboard({
                 <div className="admin-profile-menu">
                   <button className="menu-item-btn" onClick={() => setActiveTab('settings')}>
                     <Settings size={15} /> Cilësimet
-                  </button>
-                  <button className="menu-item-btn" onClick={onViewStore}>
-                    <ExternalLink size={15} /> Shiko Dyqanin
                   </button>
                   <button className="menu-item-btn text-danger" onClick={onLogout}>
                     <LogOut size={15} /> Dil (Logout)
@@ -515,7 +366,6 @@ export default function AdminDashboard({
                       </span>
                     </div>
                   </div>
-                  {/* Mini Sparkline Curve */}
                   <svg className="stat-sparkline" viewBox="0 0 100 40">
                     <path
                       d={totalSales > 0 ? "M 0 32 Q 25 10, 50 24 T 100 8" : "M 0 35 L 100 35"}
@@ -660,7 +510,6 @@ export default function AdminDashboard({
 
                       {totalSales === 0 ? (
                         <>
-                          {/* Zero Sales State: Flat line at 0 */}
                           <line x1="50" y1="210" x2="660" y2="210" stroke="#2563eb" strokeWidth="2.5" />
                           <circle cx="50" cy="210" r="4" fill="#2563eb" />
                           <circle cx="200" cy="210" r="4" fill="#2563eb" />
@@ -670,7 +519,6 @@ export default function AdminDashboard({
                         </>
                       ) : (
                         <>
-                          {/* Live Dynamic Sales Path */}
                           <path
                             d="M 50 210 
                                C 100 200, 150 170, 250 145 
@@ -698,7 +546,6 @@ export default function AdminDashboard({
                       )}
                     </svg>
 
-                    {/* Tooltip Badge positioned on active point */}
                     <div
                       className="chart-tooltip-badge"
                       style={{
@@ -711,7 +558,6 @@ export default function AdminDashboard({
                     </div>
                   </div>
 
-                  {/* X-Axis Dates */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 40px 0 50px', fontSize: '0.8rem', color: '#94a3b8', fontWeight: '600' }}>
                     <span>Oct 1</span>
                     <span>Oct 7</span>
@@ -913,8 +759,7 @@ export default function AdminDashboard({
 
               {/* Orders Filters & Search */}
               <div style={{ display: 'flex', gap: '12px', margin: '20px 0', flexWrap: 'wrap' }}>
-                <div className="admin-search-box" style={{ maxWidth: '320px' }}>
-                  <Search size={16} color="#94a3b8" />
+                <div className="admin-search-box" style={{ maxWidth: '320px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
                   <input
                     type="text"
                     placeholder="Kërko me ID, klient, qytet..."
@@ -1056,8 +901,7 @@ export default function AdminDashboard({
 
               {/* Filters */}
               <div style={{ display: 'flex', gap: '12px', margin: '20px 0', flexWrap: 'wrap' }}>
-                <div className="admin-search-box" style={{ maxWidth: '320px' }}>
-                  <Search size={16} color="#94a3b8" />
+                <div className="admin-search-box" style={{ maxWidth: '320px', background: '#ffffff', border: '1px solid #cbd5e1' }}>
                   <input
                     type="text"
                     placeholder="Kërko produktin me emër..."
@@ -1078,10 +922,9 @@ export default function AdminDashboard({
                   }}
                 >
                   <option value="all">Të Gjitha Kategoritë</option>
-                  <option value="kitchen">Kuzhinë & Enë</option>
-                  <option value="bedding">Tekstil & Fjetje</option>
-                  <option value="decor">Dekor & Living</option>
-                  <option value="bath">Banjë & Spa</option>
+                  {categories.filter(c => c.id !== 'all').map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
                 </select>
               </div>
 
@@ -1163,23 +1006,45 @@ export default function AdminDashboard({
             </div>
           )}
 
-          {/* TAB 4: CATEGORIES */}
+          {/* TAB 4: CATEGORIES (With Add Category Button & Modal) */}
           {activeTab === 'categories' && (
             <div className="dashboard-panel-card">
               <div className="panel-header-row">
-                <h2>Kategoritë e Dyqanit</h2>
+                <div>
+                  <h2 style={{ margin: '0 0 4px', fontSize: '1.4rem' }}>Kategoritë e Dyqanit</h2>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
+                    Menaxhoni dhe shtoni kategori të reja për produktet e MaxMarket.
+                  </p>
+                </div>
+
+                <button
+                  className="admin-return-dashboard-btn"
+                  onClick={() => setIsAddCategoryOpen(true)}
+                  style={{ padding: '9px 18px', fontSize: '0.92rem' }}
+                >
+                  <PlusCircle size={18} />
+                  <span>Shto Kategori +</span>
+                </button>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px', marginTop: '16px' }}>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px', marginTop: '20px' }}>
                 {categories.map((cat) => (
-                  <div key={cat.id} style={{ border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', background: '#f8fafc' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <LayoutGrid size={22} color="#2563eb" />
+                  <div key={cat.id} style={{ border: '1.5px solid #e2e8f0', borderRadius: '14px', padding: '18px', background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <LayoutGrid size={20} />
+                      </div>
                       <span className="nav-badge-pill" style={{ background: '#2563eb', color: '#fff' }}>
-                        {products.filter(p => cat.id === 'all' ? true : p.category === cat.id).length} produkte
+                        {products.filter(p => cat.id === 'all' ? true : p.category === cat.id).length} artikuj
                       </span>
                     </div>
-                    <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem' }}>{cat.name}</h3>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>ID: {cat.id}</p>
+                    <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: '700' }}>{cat.name}</h3>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>slug: {cat.id}</p>
+                    {cat.badge && (
+                      <span style={{ display: 'inline-block', marginTop: '8px', fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '12px', background: '#dcfce7', color: '#16a34a' }}>
+                        {cat.badge}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1304,30 +1169,7 @@ export default function AdminDashboard({
             </div>
           )}
 
-          {/* TAB 8: REPORTS */}
-          {activeTab === 'reports' && (
-            <div className="dashboard-panel-card">
-              <div className="panel-header-row">
-                <h2>Raporti Financiar & Dërgesat</h2>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginTop: '16px' }}>
-                <div style={{ background: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h4 style={{ margin: '0 0 10px', color: '#64748b' }}>Kompanitë e Transportit</h4>
-                  <p>🏛️ Posta</p>
-                  <p>🚐 Mikmik</p>
-                  <p>⚡ Posta e shpejtë</p>
-                  <p>🐆 PostaCheetah</p>
-                </div>
-                <div style={{ background: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                  <h4 style={{ margin: '0 0 10px', color: '#64748b' }}>Mënyrat e Pagesës</h4>
-                  <p>💵 Para në Dorë (Cash)</p>
-                  <p>💳 Kartelë Bankare</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 9: SETTINGS */}
+          {/* TAB 8: SETTINGS */}
           {activeTab === 'settings' && (
             <div className="dashboard-panel-card" style={{ maxWidth: '650px' }}>
               <div className="panel-header-row">
@@ -1356,22 +1198,72 @@ export default function AdminDashboard({
               </div>
             </div>
           )}
-
-          {/* TAB 10: SELLERS, MESSAGES, SUPPORT */}
-          {(activeTab === 'sellers' || activeTab === 'messages' || activeTab === 'support') && (
-            <div className="dashboard-panel-card">
-              <h2 style={{ textTransform: 'capitalize' }}>{activeTab}</h2>
-              <p style={{ color: '#64748b' }}>
-                Ky modul është plotësisht i integruar me panelin tuaj të MaxMarket.
-              </p>
-              <div style={{ padding: '24px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1', textAlign: 'center' }}>
-                <CheckCircle2 size={36} color="#16a34a" style={{ margin: '0 auto 12px' }} />
-                <h4>Gjithçka është në rregull dhe e sinkronizuar me bazën e të dhënave!</h4>
-              </div>
-            </div>
-          )}
         </main>
       </div>
+
+      {/* ── Modal: Shto Kategori të Re ── */}
+      {isAddCategoryOpen && (
+        <div className="admin-quick-action-modal-backdrop" onClick={() => setIsAddCategoryOpen(false)}>
+          <div className="admin-quick-action-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
+            <button className="modal-close-icon" onClick={() => setIsAddCategoryOpen(false)}>
+              <X size={18} />
+            </button>
+
+            <h3 style={{ margin: '0 0 6px', fontSize: '1.25rem' }}>
+              Shto Kategori të Re
+            </h3>
+            <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '0.85rem' }}>
+              Krijoni një kategori të re për të organizuar produktet e dyqanit.
+            </p>
+
+            <form onSubmit={handleCreateCategory}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                  Emri i Kategorisë *
+                </label>
+                <input
+                  type="text"
+                  placeholder="psh. Vegla Kopshti, Pajisje Elektrike..."
+                  value={newCatName}
+                  onChange={(e) => setNewCatName(e.target.value)}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #cbd5e1', outline: 'none' }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                  Etiketë / Badge (Opsionale)
+                </label>
+                <input
+                  type="text"
+                  placeholder="psh. E Re, Zbritje..."
+                  value={newCatBadge}
+                  onChange={(e) => setNewCatBadge(e.target.value)}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1.5px solid #cbd5e1', outline: 'none' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', cursor: 'pointer', fontWeight: '600' }}
+                  onClick={() => setIsAddCategoryOpen(false)}
+                >
+                  Anulo
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: '9px 20px', borderRadius: '8px', border: 'none', background: '#2563eb', color: '#ffffff', cursor: 'pointer', fontWeight: '700' }}
+                >
+                  <Plus size={16} style={{ display: 'inline', marginRight: '4px' }} />
+                  Krijo Kategorinë
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* ── Quick Action / Order Edit Modal ── */}
       {selectedOrderForAction && (

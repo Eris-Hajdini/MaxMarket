@@ -20,10 +20,40 @@ import { Sparkles, ArrowRight, Gift, Percent, PlusCircle, ShieldCheck, Edit3, Tr
 
 const STORAGE_KEY = 'maxmarket_products_list_v1';
 const ORDERS_STORAGE_KEY = 'maxmarket_orders_list_v1';
+const CATEGORIES_STORAGE_KEY = 'maxmarket_categories_list_v1';
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
+  const [isLoginIntro, setIsLoginIntro] = useState(false);
+  const [loginUser, setLoginUser] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
+
+  // Load categories from localStorage if available, otherwise initial CATEGORIES
+  const [categoriesList, setCategoriesList] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CATEGORIES_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.error("Could not load stored categories", e);
+    }
+    return CATEGORIES;
+  });
+
+  // Save categories to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(CATEGORIES_STORAGE_KEY, JSON.stringify(categoriesList));
+    } catch (e) {
+      console.error("Could not save categories to localStorage", e);
+    }
+  }, [categoriesList]);
+
+  const handleAddCategory = (newCat) => {
+    setCategoriesList((prev) => [...prev, newCat]);
+  };
 
   // Load products from localStorage if available, otherwise initialProducts
   const [productsList, setProductsList] = useState(() => {
@@ -131,26 +161,38 @@ function App() {
     });
   };
 
-  // Login Handler
+  // Login Handler with 5-second logo transition
   const handleLoginSuccess = (user) => {
-    setCurrentUser(user);
-    if (user.role === 'admin') {
-      setViewMode('admin');
-    } else {
-      setViewMode('store');
-      // If cart has items, go directly to checkout after login
-      setCart((prevCart) => {
-        if (prevCart.length > 0) {
-          setTimeout(() => setIsCheckoutOpen(true), 200);
-        }
-        return prevCart;
-      });
+    setLoginUser(user);
+    setIsLoginIntro(true);
+    setShowIntro(true);
+  };
+
+  const handleFinishIntro = () => {
+    setShowIntro(false);
+    if (isLoginIntro && loginUser) {
+      setCurrentUser(loginUser);
+      if (loginUser.role === 'admin') {
+        setViewMode('admin');
+      } else {
+        setViewMode('store');
+        setCart((prevCart) => {
+          if (prevCart.length > 0) {
+            setTimeout(() => setIsCheckoutOpen(true), 200);
+          }
+          return prevCart;
+        });
+      }
+      setIsLoginIntro(false);
+      setLoginUser(null);
     }
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
     setViewMode('store');
+    setIsLoginIntro(false);
+    setLoginUser(null);
   };
 
   // Add Product Handler (Admin)
@@ -240,9 +282,14 @@ function App() {
 
   return (
     <div className="app-root">
-      {/* Big Splash Logo Intro Transition */}
+      {/* Big Splash Logo Intro Transition & 5s Login Animation */}
       {showIntro && (
-        <LogoIntro onFinish={() => setShowIntro(false)} />
+        <LogoIntro
+          onFinish={handleFinishIntro}
+          isLogin={isLoginIntro}
+          loginUser={loginUser}
+          duration={5000}
+        />
       )}
 
       {/* ADMIN DASHBOARD (When Admin is logged in and viewMode is 'admin') */}
@@ -250,7 +297,7 @@ function App() {
         <AdminDashboard
           products={productsList}
           orders={orders}
-          categories={CATEGORIES}
+          categories={categoriesList}
           currentUser={currentUser}
           onUpdateStatus={handleUpdateOrderStatus}
           onDeleteOrder={handleDeleteOrder}
@@ -258,7 +305,7 @@ function App() {
           onAddProduct={() => setIsAddProductOpen(true)}
           onEditProduct={(p) => setEditingProduct(p)}
           onDeleteProduct={handleDeleteProduct}
-          onViewStore={() => setViewMode('store')}
+          onAddCategory={handleAddCategory}
           onLogout={handleLogout}
         />
       ) : (
@@ -354,6 +401,7 @@ function App() {
         {/* Category Pills Slider / Filter */}
         <CategoryBar 
           activeCategory={activeCategory} 
+          categories={categoriesList}
           onSelectCategory={(catId) => {
             setActiveCategory(catId);
             const el = document.getElementById('products-section');
@@ -579,6 +627,7 @@ function App() {
         isOpen={isAddProductOpen}
         onClose={() => setIsAddProductOpen(false)}
         onAddProduct={handleAddProduct}
+        categories={categoriesList}
       />
 
       {/* Product Selector Modal for Edit (Admin Exclusive) */}

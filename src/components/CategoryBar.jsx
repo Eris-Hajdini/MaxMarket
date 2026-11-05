@@ -18,12 +18,14 @@ const iconMap = {
   Flame: Flame
 };
 
-export default function CategoryBar({ activeCategory, onSelectCategory }) {
+export default function CategoryBar({ activeCategory, onSelectCategory, categories = CATEGORIES }) {
+  const displayCategories = categories && categories.length > 0 ? categories : CATEGORIES;
+
   return (
     <div className="categories-pill-section">
       <div className="container">
         <div className="category-scroll-list">
-          {CATEGORIES.map((cat) => {
+          {displayCategories.map((cat) => {
             const Icon = iconMap[cat.icon] || Sparkles;
             const isSelected = activeCategory === cat.id;
 
