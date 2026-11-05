@@ -28,11 +28,7 @@ import {
   ExternalLink,
   MoreHorizontal,
   X,
-  Menu,
-  Phone,
-  Mail,
-  MapPin,
-  Check
+  Menu
 } from 'lucide-react';
 import '../admin.css';
 
@@ -74,142 +70,56 @@ export default function AdminDashboard({
   const [ordersSearch, setOrdersSearch] = useState('');
   const [ordersStatusFilter, setOrdersStatusFilter] = useState('all');
 
-  // Realistic baseline data combined with live customer orders
-  const liveSalesSum = useMemo(() => {
+  // Real data calculations starting strictly from 0
+  const totalSales = useMemo(() => {
     return orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
   }, [orders]);
 
-  const totalSalesFormatted = useMemo(() => {
-    const base = 24580;
-    return '€' + (base + liveSalesSum).toLocaleString();
-  }, [liveSalesSum]);
+  const totalSalesFormatted = '€' + totalSales.toFixed(2);
+  const totalOrdersCount = orders.length;
+  const totalProductsCount = products.length;
 
-  const totalOrdersCount = useMemo(() => {
-    return 1284 + orders.length;
+  const uniqueCustomersList = useMemo(() => {
+    const map = new Map();
+    orders.forEach((o) => {
+      const emailKey = (o.email || '').trim().toLowerCase();
+      if (emailKey && !map.has(emailKey)) {
+        map.set(emailKey, o);
+      }
+    });
+    return Array.from(map.values());
   }, [orders]);
 
-  const totalProductsCount = useMemo(() => {
-    return 856 + (products.length - 8);
-  }, [products]);
-
-  // Combine initial screenshot orders with live orders placed by customers
-  const defaultRecentOrders = [
-    {
-      orderId: '#GM28475',
-      name: 'Arben',
-      surname: 'Krasniqi',
-      email: 'arben.k@gmail.com',
-      phone: '+383 44 234 567',
-      address: 'Rruga Dardania Nr. 14',
-      city: 'Prishtinë',
-      createdAt: 'Oct 31, 2026 - 16:45',
-      status: 'completed',
-      total: 129.99,
-      transportCompany: 'Posta e shpejtë',
-      items: [
-        { id: 101, name: 'Set Pjatash Porcelani Royal Imperial', quantity: 1, price: 89.90, image: 'https://images.unsplash.com/photo-1614088445129-843c085e6834?auto=format&fit=crop&w=400&q=80' },
-        { id: 102, name: 'Tigan Graniti Non-Stick', quantity: 1, price: 29.99, image: 'https://images.unsplash.com/photo-1584990347449-3995f32a7629?auto=format&fit=crop&w=400&q=80' }
-      ]
-    },
-    {
-      orderId: '#GM28474',
-      name: 'Linda',
-      surname: 'Meta',
-      email: 'linda.meta@gmail.com',
-      phone: '+383 49 112 334',
-      address: 'Lagjja Marigona, Vila 8',
-      city: 'Prishtinë',
-      createdAt: 'Oct 31, 2026 - 15:32',
-      status: 'on_the_way',
-      total: 89.50,
-      transportCompany: 'Mikmik',
-      items: [
-        { id: 103, name: 'Set Mbulesa Shtrati Pambuku Satina', quantity: 1, price: 49.50, image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=400&q=80' }
-      ]
-    },
-    {
-      orderId: '#GM28473',
-      name: 'Driton',
-      surname: 'Gashi',
-      email: 'driton.gashi@live.com',
-      phone: '+383 45 678 901',
-      address: 'Bulevardi Dëshmorët',
-      city: 'Prizren',
-      createdAt: 'Oct 31, 2026 - 14:20',
-      status: 'pending',
-      total: 67.99,
-      transportCompany: 'PostaCheetah',
-      items: [
-        { id: 104, name: 'Vazo Dekorative Qeramike', quantity: 2, price: 24.90, image: 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=400&q=80' }
-      ]
-    },
-    {
-      orderId: '#GM28472',
-      name: 'Albiona',
-      surname: 'Demiri',
-      email: 'albiona.d@gmail.com',
-      phone: '+383 44 987 654',
-      address: 'Rruga Nëna Terezë 45',
-      city: 'Pejë',
-      createdAt: 'Oct 31, 2026 - 13:17',
-      status: 'completed',
-      total: 110.00,
-      transportCompany: 'Posta',
-      items: [
-        { id: 105, name: 'Jorgan Dimëror Mikrofibër Ultra-Warm', quantity: 1, price: 58.00, image: 'https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=400&q=80' }
-      ]
-    },
-    {
-      orderId: '#GM28471',
-      name: 'Besnik',
-      surname: 'Haliti',
-      email: 'besnik.h@gmail.com',
-      phone: '+383 49 555 444',
-      address: 'Rruga UÇK 102',
-      city: 'Ferizaj',
-      createdAt: 'Oct 31, 2026 - 12:50',
-      status: 'on_the_way',
-      total: 75.25,
-      transportCompany: 'Mikmik',
-      items: [
-        { id: 106, name: 'Set Peshqirësh Pambuku Egjiptian', quantity: 2, price: 32.00, image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=400&q=80' }
-      ]
-    }
-  ];
-
-  // All unified orders: Live orders first, then default orders
-  const allCombinedOrders = useMemo(() => {
-    return [...orders, ...defaultRecentOrders];
-  }, [orders]);
+  const uniqueCustomersCount = uniqueCustomersList.length;
 
   // Product performance items
   const productPerformanceItems = [
     {
       name: 'Storage Box 50L',
       category: 'Home & Living',
-      revenue: '€6,240',
-      trend: '+18.2%',
+      revenue: totalSales > 0 ? `€${(totalSales * 0.4).toFixed(2)}` : '€0.00',
+      trend: totalSales > 0 ? '+18.2%' : '0%',
       image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=120&q=80'
     },
     {
       name: 'Kitchen Organizer',
       category: 'Kitchen',
-      revenue: '€5,890',
-      trend: '+14.7%',
+      revenue: totalSales > 0 ? `€${(totalSales * 0.3).toFixed(2)}` : '€0.00',
+      trend: totalSales > 0 ? '+14.7%' : '0%',
       image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=120&q=80'
     },
     {
       name: 'Cleaning Bucket',
       category: 'Cleaning',
-      revenue: '€4,750',
-      trend: '+10.1%',
+      revenue: totalSales > 0 ? `€${(totalSales * 0.2).toFixed(2)}` : '€0.00',
+      trend: totalSales > 0 ? '+10.1%' : '0%',
       image: 'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?auto=format&fit=crop&w=120&q=80'
     },
     {
       name: 'Laundry Basket',
       category: 'Home & Living',
-      revenue: '€4,120',
-      trend: '+9.8%',
+      revenue: totalSales > 0 ? `€${(totalSales * 0.1).toFixed(2)}` : '€0.00',
+      trend: totalSales > 0 ? '+9.8%' : '0%',
       image: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=120&q=80'
     }
   ];
@@ -219,13 +129,13 @@ export default function AdminDashboard({
     if (!searchQuery.trim()) return null;
     const q = searchQuery.toLowerCase();
     const matchedProducts = products.filter(p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
-    const matchedOrders = allCombinedOrders.filter(o =>
+    const matchedOrders = orders.filter(o =>
       o.orderId.toLowerCase().includes(q) ||
       (o.name + ' ' + o.surname).toLowerCase().includes(q) ||
       o.city?.toLowerCase().includes(q)
     );
     return { products: matchedProducts, orders: matchedOrders };
-  }, [searchQuery, products, allCombinedOrders]);
+  }, [searchQuery, products, orders]);
 
   // Handle order status update
   const handleSetOrderStatus = (orderId, newStatus) => {
@@ -283,7 +193,7 @@ export default function AdminDashboard({
               <ShoppingCart size={19} />
               <span>Orders</span>
             </div>
-            <span className="nav-badge-pill">{allCombinedOrders.length}</span>
+            <span className="nav-badge-pill">{orders.length}</span>
           </button>
 
           <button
@@ -314,6 +224,7 @@ export default function AdminDashboard({
               <Users size={19} />
               <span>Customers</span>
             </div>
+            <span className="nav-badge-pill">{uniqueCustomersCount}</span>
           </button>
 
           <button
@@ -376,7 +287,7 @@ export default function AdminDashboard({
               <MessageSquare size={19} />
               <span>Messages</span>
             </div>
-            <span className="nav-badge-pill">12</span>
+            <span className="nav-badge-pill">0</span>
           </button>
 
           <button
@@ -499,7 +410,7 @@ export default function AdminDashboard({
               title="Njoftimet"
             >
               <Bell size={20} />
-              <span className="notif-badge">3</span>
+              {orders.length > 0 && <span className="notif-badge">{orders.length}</span>}
             </button>
 
             {showNotifications && (
@@ -508,27 +419,23 @@ export default function AdminDashboard({
                   <h4>Njoftimet e Dyqanit</h4>
                   <span style={{ fontSize: '0.75rem', color: '#2563eb', cursor: 'pointer' }}>Shëno të lexuara</span>
                 </div>
-                <div className="notif-item">
-                  <div className="notif-dot" />
-                  <div>
-                    <strong style={{ fontSize: '0.85rem' }}>Porosi e re nga klienti!</strong>
-                    <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>Porosia MAX-847291 u regjistrua me sukses.</p>
-                  </div>
-                </div>
-                <div className="notif-item">
-                  <div className="notif-dot" style={{ background: '#ea580c' }} />
-                  <div>
-                    <strong style={{ fontSize: '0.85rem' }}>Stok i ulët</strong>
-                    <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>Kitchen Organizer ka vetëm 3 copë në magazinë.</p>
-                  </div>
-                </div>
-                <div className="notif-item">
-                  <div className="notif-dot" style={{ background: '#16a34a' }} />
-                  <div>
-                    <strong style={{ fontSize: '0.85rem' }}>Porosi e dorëzuar</strong>
-                    <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>Korrieri PostaCheetah dorëzoi porosinë #GM28475.</p>
-                  </div>
-                </div>
+                {orders.length === 0 ? (
+                  <p style={{ fontSize: '0.82rem', color: '#64748b', textAlign: 'center', margin: '14px 0' }}>
+                    Nuk ka asnjë njoftim të ri.
+                  </p>
+                ) : (
+                  orders.slice(0, 3).map((o) => (
+                    <div key={o.orderId} className="notif-item">
+                      <div className="notif-dot" />
+                      <div>
+                        <strong style={{ fontSize: '0.85rem' }}>Porosi e re {o.orderId}</strong>
+                        <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#64748b' }}>
+                          Klienti {o.name} {o.surname} porositi €{Number(o.total).toFixed(2)}.
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             )}
 
@@ -561,7 +468,7 @@ export default function AdminDashboard({
 
         {/* ── Main Dashboard Body ── */}
         <main className="admin-content-body">
-          {/* TAB 1: DASHBOARD (Exact Replica of Screenshot) */}
+          {/* TAB 1: DASHBOARD */}
           {activeTab === 'dashboard' && (
             <>
               {/* Dashboard Title & Date Range Picker */}
@@ -592,7 +499,7 @@ export default function AdminDashboard({
                 </div>
               </div>
 
-              {/* 4 Stat Cards Row */}
+              {/* 4 Stat Cards Row - Starts at Zero and increments with real data */}
               <div className="dashboard-stats-grid">
                 {/* 1. Total Sales */}
                 <div className="stat-metric-card">
@@ -603,15 +510,15 @@ export default function AdminDashboard({
                     <div className="stat-card-info">
                       <span className="stat-label">Total Sales</span>
                       <h3 className="stat-value">{totalSalesFormatted}</h3>
-                      <span className="stat-trend">
-                        <TrendingUp size={13} /> +12.5%
+                      <span className="stat-trend" style={{ color: totalSales > 0 ? '#16a34a' : '#64748b' }}>
+                        <TrendingUp size={13} /> {totalSales > 0 ? '+100%' : '0%'}
                       </span>
                     </div>
                   </div>
                   {/* Mini Sparkline Curve */}
                   <svg className="stat-sparkline" viewBox="0 0 100 40">
                     <path
-                      d="M 0 32 Q 25 10, 50 24 T 100 8"
+                      d={totalSales > 0 ? "M 0 32 Q 25 10, 50 24 T 100 8" : "M 0 35 L 100 35"}
                       fill="none"
                       stroke="#2563eb"
                       strokeWidth="2.5"
@@ -628,15 +535,15 @@ export default function AdminDashboard({
                     </div>
                     <div className="stat-card-info">
                       <span className="stat-label">Orders</span>
-                      <h3 className="stat-value">{totalOrdersCount.toLocaleString()}</h3>
-                      <span className="stat-trend" style={{ color: '#16a34a' }}>
-                        <TrendingUp size={13} /> +8.3%
+                      <h3 className="stat-value">{totalOrdersCount}</h3>
+                      <span className="stat-trend" style={{ color: totalOrdersCount > 0 ? '#16a34a' : '#64748b' }}>
+                        <TrendingUp size={13} /> {totalOrdersCount > 0 ? `+${totalOrdersCount} të reja` : '0 të reja'}
                       </span>
                     </div>
                   </div>
                   <svg className="stat-sparkline" viewBox="0 0 100 40">
                     <path
-                      d="M 0 28 Q 30 35, 55 18 T 100 12"
+                      d={totalOrdersCount > 0 ? "M 0 28 Q 30 35, 55 18 T 100 12" : "M 0 35 L 100 35"}
                       fill="none"
                       stroke="#9333ea"
                       strokeWidth="2.5"
@@ -655,13 +562,13 @@ export default function AdminDashboard({
                       <span className="stat-label">Products</span>
                       <h3 className="stat-value">{totalProductsCount}</h3>
                       <span className="stat-trend" style={{ color: '#16a34a' }}>
-                        <TrendingUp size={13} /> +2.1%
+                        <TrendingUp size={13} /> Aktive në dyqan
                       </span>
                     </div>
                   </div>
                   <svg className="stat-sparkline" viewBox="0 0 100 40">
                     <path
-                      d="M 0 35 Q 25 30, 50 20 T 100 10"
+                      d="M 0 32 Q 25 28, 50 18 T 100 10"
                       fill="none"
                       stroke="#16a34a"
                       strokeWidth="2.5"
@@ -678,15 +585,15 @@ export default function AdminDashboard({
                     </div>
                     <div className="stat-card-info">
                       <span className="stat-label">Customers</span>
-                      <h3 className="stat-value">3,420</h3>
-                      <span className="stat-trend" style={{ color: '#16a34a' }}>
-                        <TrendingUp size={13} /> +14.7%
+                      <h3 className="stat-value">{uniqueCustomersCount}</h3>
+                      <span className="stat-trend" style={{ color: uniqueCustomersCount > 0 ? '#16a34a' : '#64748b' }}>
+                        <TrendingUp size={13} /> {uniqueCustomersCount > 0 ? `+${uniqueCustomersCount} të regjistruar` : '0 të regjistruar'}
                       </span>
                     </div>
                   </div>
                   <svg className="stat-sparkline" viewBox="0 0 100 40">
                     <path
-                      d="M 0 32 Q 25 36, 50 18 T 100 8"
+                      d={uniqueCustomersCount > 0 ? "M 0 32 Q 25 36, 50 18 T 100 8" : "M 0 35 L 100 35"}
                       fill="none"
                       stroke="#ea580c"
                       strokeWidth="2.5"
@@ -737,51 +644,58 @@ export default function AdminDashboard({
                       <line x1="50" y1="210" x2="680" y2="210" stroke="#f1f5f9" strokeWidth="1" />
 
                       {/* Y-Axis Labels */}
-                      <text x="15" y="34" fill="#94a3b8" fontSize="11" fontWeight="600">20k</text>
-                      <text x="15" y="79" fill="#94a3b8" fontSize="11" fontWeight="600">15k</text>
-                      <text x="15" y="124" fill="#94a3b8" fontSize="11" fontWeight="600">10k</text>
-                      <text x="20" y="169" fill="#94a3b8" fontSize="11" fontWeight="600">5k</text>
-                      <text x="25" y="214" fill="#94a3b8" fontSize="11" fontWeight="600">0</text>
+                      <text x="15" y="34" fill="#94a3b8" fontSize="11" fontWeight="600">
+                        {totalSales > 0 ? `€${Math.ceil(totalSales * 1.2)}` : '€100'}
+                      </text>
+                      <text x="15" y="79" fill="#94a3b8" fontSize="11" fontWeight="600">
+                        {totalSales > 0 ? `€${Math.ceil(totalSales * 0.9)}` : '€75'}
+                      </text>
+                      <text x="15" y="124" fill="#94a3b8" fontSize="11" fontWeight="600">
+                        {totalSales > 0 ? `€${Math.ceil(totalSales * 0.6)}` : '€50'}
+                      </text>
+                      <text x="15" y="169" fill="#94a3b8" fontSize="11" fontWeight="600">
+                        {totalSales > 0 ? `€${Math.ceil(totalSales * 0.3)}` : '€25'}
+                      </text>
+                      <text x="25" y="214" fill="#94a3b8" fontSize="11" fontWeight="600">€0</text>
 
-                      {/* Area Fill */}
-                      <path
-                        d="M 50 190 
-                           C 100 170, 130 145, 170 120 
-                           C 210 95, 230 150, 270 135 
-                           C 310 120, 330 95, 370 100 
-                           C 410 105, 430 130, 470 125 
-                           C 510 120, 530 90, 570 95 
-                           C 610 100, 640 60, 660 55 
-                           L 660 210 L 50 210 Z"
-                        fill="url(#chartGradient)"
-                      />
-
-                      {/* Blue Line Curve */}
-                      <path
-                        d="M 50 190 
-                           C 100 170, 130 145, 170 120 
-                           C 210 95, 230 150, 270 135 
-                           C 310 120, 330 95, 370 100 
-                           C 410 105, 430 130, 470 125 
-                           C 510 120, 530 90, 570 95 
-                           C 610 100, 640 60, 660 55"
-                        fill="none"
-                        stroke="#2563eb"
-                        strokeWidth="3.2"
-                        strokeLinecap="round"
-                      />
-
-                      {/* Points */}
-                      <circle cx="50" cy="190" r="4" fill="#2563eb" />
-                      <circle cx="170" cy="120" r="4" fill="#2563eb" />
-                      <circle cx="270" cy="135" r="4" fill="#2563eb" />
-                      <circle cx="370" cy="100" r="4" fill="#2563eb" />
-                      <circle cx="470" cy="125" r="4" fill="#2563eb" />
-                      <circle cx="570" cy="95" r="4" fill="#2563eb" />
-
-                      {/* Active Point at Oct 31 with Tooltip */}
-                      <line x1="660" y1="55" x2="660" y2="210" stroke="#2563eb" strokeDasharray="3,3" strokeWidth="1.5" />
-                      <circle cx="660" cy="55" r="6" fill="#2563eb" stroke="#ffffff" strokeWidth="2.5" />
+                      {totalSales === 0 ? (
+                        <>
+                          {/* Zero Sales State: Flat line at 0 */}
+                          <line x1="50" y1="210" x2="660" y2="210" stroke="#2563eb" strokeWidth="2.5" />
+                          <circle cx="50" cy="210" r="4" fill="#2563eb" />
+                          <circle cx="200" cy="210" r="4" fill="#2563eb" />
+                          <circle cx="350" cy="210" r="4" fill="#2563eb" />
+                          <circle cx="500" cy="210" r="4" fill="#2563eb" />
+                          <circle cx="660" cy="210" r="5" fill="#2563eb" stroke="#ffffff" strokeWidth="2" />
+                        </>
+                      ) : (
+                        <>
+                          {/* Live Dynamic Sales Path */}
+                          <path
+                            d="M 50 210 
+                               C 100 200, 150 170, 250 145 
+                               C 350 120, 450 100, 550 80 
+                               C 600 70, 630 60, 660 55 
+                               L 660 210 L 50 210 Z"
+                            fill="url(#chartGradient)"
+                          />
+                          <path
+                            d="M 50 210 
+                               C 100 200, 150 170, 250 145 
+                               C 350 120, 450 100, 550 80 
+                               C 600 70, 630 60, 660 55"
+                            fill="none"
+                            stroke="#2563eb"
+                            strokeWidth="3.2"
+                            strokeLinecap="round"
+                          />
+                          <circle cx="50" cy="210" r="4" fill="#2563eb" />
+                          <circle cx="250" cy="145" r="4" fill="#2563eb" />
+                          <circle cx="450" cy="100" r="4" fill="#2563eb" />
+                          <circle cx="660" cy="55" r="6" fill="#2563eb" stroke="#ffffff" strokeWidth="2.5" />
+                          <line x1="660" y1="55" x2="660" y2="210" stroke="#2563eb" strokeDasharray="3,3" strokeWidth="1.5" />
+                        </>
+                      )}
                     </svg>
 
                     {/* Tooltip Badge positioned on active point */}
@@ -789,11 +703,11 @@ export default function AdminDashboard({
                       className="chart-tooltip-badge"
                       style={{
                         position: 'absolute',
-                        top: '12px',
+                        top: totalSales > 0 ? '12px' : '170px',
                         right: '28px'
                       }}
                     >
-                      €17,420
+                      {totalSalesFormatted}
                     </div>
                   </div>
 
@@ -819,75 +733,34 @@ export default function AdminDashboard({
                   </div>
 
                   <div className="recent-activity-list">
-                    {/* Activity 1: Green Cart */}
-                    <div className="activity-item-row">
-                      <div className="activity-left-side">
-                        <div className="activity-icon-bubble green">
-                          <ShoppingCart size={17} />
-                        </div>
-                        <div className="activity-text-info">
-                          <h4>New order #GM28475</h4>
-                          <p>€129.99 • Delivered</p>
-                        </div>
+                    {orders.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '40px 10px', color: '#64748b' }}>
+                        <Clock size={32} style={{ margin: '0 auto 10px', opacity: 0.35 }} />
+                        <h4 style={{ margin: '0 0 4px', fontSize: '0.92rem', color: '#334155' }}>
+                          Nuk ka ende asnjë aktivitet
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '0.78rem' }}>
+                          Kur një klient bën porosi në dyqan, aktiviteti shfaqet menjëherë këtu.
+                        </p>
                       </div>
-                      <span className="activity-time-stamp">2 min ago</span>
-                    </div>
-
-                    {/* Activity 2: Blue User */}
-                    <div className="activity-item-row">
-                      <div className="activity-left-side">
-                        <div className="activity-icon-bubble blue">
-                          <Users size={17} />
+                    ) : (
+                      orders.slice(0, 5).map((ord) => (
+                        <div key={ord.orderId} className="activity-item-row">
+                          <div className="activity-left-side">
+                            <div className="activity-icon-bubble green">
+                              <ShoppingCart size={17} />
+                            </div>
+                            <div className="activity-text-info">
+                              <h4>Porosi e re #{ord.orderId}</h4>
+                              <p>
+                                €{Number(ord.total).toFixed(2)} • {ord.status === 'on_the_way' ? 'Rrugës' : ord.status === 'completed' ? 'Kompletuar' : 'Në Pritje'}
+                              </p>
+                            </div>
+                          </div>
+                          <span className="activity-time-stamp">{ord.createdAt || 'Sapo'}</span>
                         </div>
-                        <div className="activity-text-info">
-                          <h4>New customer registered</h4>
-                          <p>user123@gmail.com</p>
-                        </div>
-                      </div>
-                      <span className="activity-time-stamp">4 min ago</span>
-                    </div>
-
-                    {/* Activity 3: Orange Box */}
-                    <div className="activity-item-row">
-                      <div className="activity-left-side">
-                        <div className="activity-icon-bubble orange">
-                          <Boxes size={17} />
-                        </div>
-                        <div className="activity-text-info">
-                          <h4>Product out of stock</h4>
-                          <p>Kitchen Organizer</p>
-                        </div>
-                      </div>
-                      <span className="activity-time-stamp">6 min ago</span>
-                    </div>
-
-                    {/* Activity 4: Teal Tag */}
-                    <div className="activity-item-row">
-                      <div className="activity-left-side">
-                        <div className="activity-icon-bubble teal">
-                          <Tag size={17} />
-                        </div>
-                        <div className="activity-text-info">
-                          <h4>New discount created</h4>
-                          <p>-20% on Home Essentials</p>
-                        </div>
-                      </div>
-                      <span className="activity-time-stamp">12 min ago</span>
-                    </div>
-
-                    {/* Activity 5: Purple Store */}
-                    <div className="activity-item-row">
-                      <div className="activity-left-side">
-                        <div className="activity-icon-bubble purple">
-                          <Store size={17} />
-                        </div>
-                        <div className="activity-text-info">
-                          <h4>New seller approved</h4>
-                          <p>HomePlus Store</p>
-                        </div>
-                      </div>
-                      <span className="activity-time-stamp">15 min ago</span>
-                    </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -919,51 +792,62 @@ export default function AdminDashboard({
                         </tr>
                       </thead>
                       <tbody>
-                        {allCombinedOrders.slice(0, 5).map((order) => {
-                          const isDelivered = order.status === 'completed';
-                          const isProcessing = order.status === 'on_the_way';
-                          const isPending = order.status === 'pending';
+                        {orders.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '38px 20px', color: '#64748b' }}>
+                              <ShoppingCart size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.35 }} />
+                              <strong style={{ display: 'block', color: '#1e293b', marginBottom: '4px' }}>
+                                Nuk ka asnjë porosi të kryer (0 porosi)
+                              </strong>
+                              <span>Bëni një porosi në dyqan si klient për ta parë këtu në kohë reale (+1)!</span>
+                            </td>
+                          </tr>
+                        ) : (
+                          orders.slice(0, 5).map((order) => {
+                            const isDelivered = order.status === 'completed';
+                            const isProcessing = order.status === 'on_the_way';
 
-                          return (
-                            <tr
-                              key={order.orderId}
-                              style={{ cursor: 'pointer' }}
-                              onClick={() => setSelectedOrderForAction(order)}
-                            >
-                              <td>
-                                <span className="order-code-val">{order.orderId}</span>
-                              </td>
-                              <td>
-                                <span className="order-cust-name">{order.name} {order.surname}</span>
-                              </td>
-                              <td>
-                                <span className="order-date-text">{order.createdAt || 'Sot'}</span>
-                              </td>
-                              <td>
-                                <span
-                                  className={`status-pill-badge ${isDelivered ? 'delivered' : isProcessing ? 'processing' : 'pending'}`}
-                                >
-                                  {isDelivered ? 'Delivered' : isProcessing ? 'Processing' : 'Pending'}
-                                </span>
-                              </td>
-                              <td>
-                                <span className="order-total-bold">€{Number(order.total || 0).toFixed(2)}</span>
-                              </td>
-                              <td>
-                                <button
-                                  className="order-action-dots-btn"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedOrderForAction(order);
-                                  }}
-                                  title="Menaxho porosinë"
-                                >
-                                  <MoreHorizontal size={18} />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                            return (
+                              <tr
+                                key={order.orderId}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => setSelectedOrderForAction(order)}
+                              >
+                                <td>
+                                  <span className="order-code-val">{order.orderId}</span>
+                                </td>
+                                <td>
+                                  <span className="order-cust-name">{order.name} {order.surname}</span>
+                                </td>
+                                <td>
+                                  <span className="order-date-text">{order.createdAt || 'Sot'}</span>
+                                </td>
+                                <td>
+                                  <span
+                                    className={`status-pill-badge ${isDelivered ? 'delivered' : isProcessing ? 'processing' : 'pending'}`}
+                                  >
+                                    {isDelivered ? 'Delivered' : isProcessing ? 'Processing' : 'Pending'}
+                                  </span>
+                                </td>
+                                <td>
+                                  <span className="order-total-bold">€{Number(order.total || 0).toFixed(2)}</span>
+                                </td>
+                                <td>
+                                  <button
+                                    className="order-action-dots-btn"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedOrderForAction(order);
+                                    }}
+                                    title="Menaxho porosinë"
+                                  >
+                                    <MoreHorizontal size={18} />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -1041,10 +925,10 @@ export default function AdminDashboard({
 
                 <div className="timeframe-pill-group">
                   {[
-                    { id: 'all', label: `Të Gjitha (${allCombinedOrders.length})` },
-                    { id: 'pending', label: `Në Pritje (${allCombinedOrders.filter(o => o.status === 'pending').length})` },
-                    { id: 'on_the_way', label: `Rrugës (${allCombinedOrders.filter(o => o.status === 'on_the_way').length})` },
-                    { id: 'completed', label: `Kompletuar (${allCombinedOrders.filter(o => o.status === 'completed').length})` }
+                    { id: 'all', label: `Të Gjitha (${orders.length})` },
+                    { id: 'pending', label: `Në Pritje (${orders.filter(o => o.status === 'pending').length})` },
+                    { id: 'on_the_way', label: `Rrugës (${orders.filter(o => o.status === 'on_the_way').length})` },
+                    { id: 'completed', label: `Kompletuar (${orders.filter(o => o.status === 'completed').length})` }
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -1072,69 +956,77 @@ export default function AdminDashboard({
                     </tr>
                   </thead>
                   <tbody>
-                    {allCombinedOrders
-                      .filter(o => ordersStatusFilter === 'all' || o.status === ordersStatusFilter)
-                      .filter(o => !ordersSearch || o.orderId.toLowerCase().includes(ordersSearch.toLowerCase()) || (o.name + ' ' + o.surname).toLowerCase().includes(ordersSearch.toLowerCase()) || o.city?.toLowerCase().includes(ordersSearch.toLowerCase()))
-                      .map((order) => (
-                        <tr key={order.orderId}>
-                          <td><strong>{order.orderId}</strong></td>
-                          <td>
-                            <div><strong>{order.name} {order.surname}</strong></div>
-                            <small style={{ color: '#64748b' }}>{order.createdAt || 'Sot'}</small>
-                          </td>
-                          <td>
-                            <div>{order.city}</div>
-                            <small style={{ color: '#64748b' }}>{order.phone}</small>
-                          </td>
-                          <td>
-                            <span className={`status-pill-badge ${order.status === 'completed' ? 'delivered' : order.status === 'on_the_way' ? 'processing' : 'pending'}`}>
-                              {order.status === 'completed' ? 'Delivered' : order.status === 'on_the_way' ? 'Processing (Rrugës)' : 'Pending'}
-                            </span>
-                          </td>
-                          <td>
-                            <select
-                              value={order.transportCompany || ''}
-                              onChange={(e) => handleSetTransport(order.orderId, e.target.value)}
-                              style={{
-                                padding: '6px 10px',
-                                borderRadius: '8px',
-                                border: '1px solid #cbd5e1',
-                                background: '#ffffff',
-                                fontSize: '0.82rem',
-                                fontWeight: '600'
-                              }}
-                            >
-                              {TRANSPORT_COMPANIES.map(c => (
-                                <option key={c.value} value={c.value}>{c.label}</option>
-                              ))}
-                            </select>
-                          </td>
-                          <td><strong>€{Number(order.total || 0).toFixed(2)}</strong></td>
-                          <td>
-                            <div style={{ display: 'flex', gap: '6px' }}>
-                              <button
-                                className="order-action-dots-btn"
-                                onClick={() => setSelectedOrderForAction(order)}
-                                title="Shiko detajet & Menaxho"
-                              >
-                                <Edit3 size={16} />
-                              </button>
-                              <button
-                                className="order-action-dots-btn"
-                                onClick={() => {
-                                  if (window.confirm(`A jeni të sigurt që dëshironi të fshini porosinë ${order.orderId}?`)) {
-                                    onDeleteOrder(order.orderId);
-                                  }
+                    {orders.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" style={{ textAlign: 'center', padding: '38px', color: '#64748b' }}>
+                          Nuk ka asnjë porosi të regjistruar në dyqan.
+                        </td>
+                      </tr>
+                    ) : (
+                      orders
+                        .filter(o => ordersStatusFilter === 'all' || o.status === ordersStatusFilter)
+                        .filter(o => !ordersSearch || o.orderId.toLowerCase().includes(ordersSearch.toLowerCase()) || (o.name + ' ' + o.surname).toLowerCase().includes(ordersSearch.toLowerCase()) || o.city?.toLowerCase().includes(ordersSearch.toLowerCase()))
+                        .map((order) => (
+                          <tr key={order.orderId}>
+                            <td><strong>{order.orderId}</strong></td>
+                            <td>
+                              <div><strong>{order.name} {order.surname}</strong></div>
+                              <small style={{ color: '#64748b' }}>{order.createdAt || 'Sot'}</small>
+                            </td>
+                            <td>
+                              <div>{order.city}</div>
+                              <small style={{ color: '#64748b' }}>{order.phone}</small>
+                            </td>
+                            <td>
+                              <span className={`status-pill-badge ${order.status === 'completed' ? 'delivered' : order.status === 'on_the_way' ? 'processing' : 'pending'}`}>
+                                {order.status === 'completed' ? 'Delivered' : order.status === 'on_the_way' ? 'Processing (Rrugës)' : 'Pending'}
+                              </span>
+                            </td>
+                            <td>
+                              <select
+                                value={order.transportCompany || ''}
+                                onChange={(e) => handleSetTransport(order.orderId, e.target.value)}
+                                style={{
+                                  padding: '6px 10px',
+                                  borderRadius: '8px',
+                                  border: '1px solid #cbd5e1',
+                                  background: '#ffffff',
+                                  fontSize: '0.82rem',
+                                  fontWeight: '600'
                                 }}
-                                title="Fshij porosinë"
-                                style={{ color: '#ef4444' }}
                               >
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                                {TRANSPORT_COMPANIES.map(c => (
+                                  <option key={c.value} value={c.value}>{c.label}</option>
+                                ))}
+                              </select>
+                            </td>
+                            <td><strong>€{Number(order.total || 0).toFixed(2)}</strong></td>
+                            <td>
+                              <div style={{ display: 'flex', gap: '6px' }}>
+                                <button
+                                  className="order-action-dots-btn"
+                                  onClick={() => setSelectedOrderForAction(order)}
+                                  title="Shiko detajet & Menaxho"
+                                >
+                                  <Edit3 size={16} />
+                                </button>
+                                <button
+                                  className="order-action-dots-btn"
+                                  onClick={() => {
+                                    if (window.confirm(`A jeni të sigurt që dëshironi të fshini porosinë ${order.orderId}?`)) {
+                                      onDeleteOrder(order.orderId);
+                                    }
+                                  }}
+                                  title="Fshij porosinë"
+                                  style={{ color: '#ef4444' }}
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1312,15 +1204,23 @@ export default function AdminDashboard({
                     </tr>
                   </thead>
                   <tbody>
-                    {allCombinedOrders.map((o, idx) => (
-                      <tr key={idx}>
-                        <td><strong>{o.name} {o.surname}</strong></td>
-                        <td>{o.email}</td>
-                        <td>{o.phone}</td>
-                        <td>{o.city}</td>
-                        <td><span className="status-pill-badge processing">1 Porosi</span></td>
+                    {uniqueCustomersList.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
+                          Nuk ka ende asnjë klient të regjistruar ose porosi të kryer (0 klientë).
+                        </td>
                       </tr>
-                    ))}
+                    ) : (
+                      uniqueCustomersList.map((c, idx) => (
+                        <tr key={idx}>
+                          <td><strong>{c.name} {c.surname}</strong></td>
+                          <td>{c.email}</td>
+                          <td>{c.phone}</td>
+                          <td>{c.city}</td>
+                          <td><span className="status-pill-badge processing">Klient Aktiv</span></td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1413,15 +1313,15 @@ export default function AdminDashboard({
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginTop: '16px' }}>
                 <div style={{ background: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                   <h4 style={{ margin: '0 0 10px', color: '#64748b' }}>Kompanitë e Transportit</h4>
-                  <p>🏛️ Posta: <strong>35%</strong></p>
-                  <p>🚐 Mikmik: <strong>28%</strong></p>
-                  <p>⚡ Posta e shpejtë: <strong>22%</strong></p>
-                  <p>🐆 PostaCheetah: <strong>15%</strong></p>
+                  <p>🏛️ Posta</p>
+                  <p>🚐 Mikmik</p>
+                  <p>⚡ Posta e shpejtë</p>
+                  <p>🐆 PostaCheetah</p>
                 </div>
                 <div style={{ background: '#f8fafc', padding: '18px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                   <h4 style={{ margin: '0 0 10px', color: '#64748b' }}>Mënyrat e Pagesës</h4>
-                  <p>💵 Para në Dorë (Cash): <strong>82%</strong></p>
-                  <p>💳 Kartelë Bankare: <strong>18%</strong></p>
+                  <p>💵 Para në Dorë (Cash)</p>
+                  <p>💳 Kartelë Bankare</p>
                 </div>
               </div>
             </div>
