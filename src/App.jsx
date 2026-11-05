@@ -14,8 +14,9 @@ import OrdersModal from './components/OrdersModal';
 import CustomerOrdersModal from './components/CustomerOrdersModal';
 import Footer from './components/Footer';
 import LogoIntro from './components/LogoIntro';
-import { PRODUCTS as initialProducts } from './data';
-import { Sparkles, ArrowRight, Gift, Percent, PlusCircle, ShieldCheck, Edit3, Truck } from 'lucide-react';
+import AdminDashboard from './components/AdminDashboard';
+import { PRODUCTS as initialProducts, CATEGORIES } from './data';
+import { Sparkles, ArrowRight, Gift, Percent, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDashboard } from 'lucide-react';
 
 const STORAGE_KEY = 'maxmarket_products_list_v1';
 const ORDERS_STORAGE_KEY = 'maxmarket_orders_list_v1';
@@ -82,6 +83,7 @@ function App() {
 
   // Authentication & Admin State
   const [currentUser, setCurrentUser] = useState(null); // null, { name, email, role: 'admin'|'client' }
+  const [viewMode, setViewMode] = useState('store'); // 'store' | 'admin'
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
@@ -133,11 +135,9 @@ function App() {
   const handleLoginSuccess = (user) => {
     setCurrentUser(user);
     if (user.role === 'admin') {
-      setTimeout(() => {
-        const el = document.getElementById('products-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
+      setViewMode('admin');
     } else {
+      setViewMode('store');
       // If cart has items, go directly to checkout after login
       setCart((prevCart) => {
         if (prevCart.length > 0) {
@@ -150,6 +150,7 @@ function App() {
 
   const handleLogout = () => {
     setCurrentUser(null);
+    setViewMode('store');
   };
 
   // Add Product Handler (Admin)
@@ -244,28 +245,84 @@ function App() {
         <LogoIntro onFinish={() => setShowIntro(false)} />
       )}
 
-      {/* Main E-commerce Website */}
-      <Navbar
-        cartCount={cart.reduce((s, i) => s + i.quantity, 0)}
-        wishlistCount={wishlist.length}
-        ordersCount={orders.length}
-        pendingOrdersCount={pendingOrdersCount}
-        currentUser={currentUser}
-        hasClientOrders={hasClientOrders}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenWishlist={() => {
-          if (wishlist.length === 0) {
-            alert("Nuk keni ende asnjë produkt në listën e dëshirave. Shtypni ikonën e zemrës tek produktet për t'i ruajtur!");
-          } else {
-            alert(`Keni ${wishlist.length} produkte të ruajtura në listën tuaj të dëshirave!`);
-          }
-        }}
-        onOpenOrders={() => setIsOrdersOpen(true)}
-        onOpenCustomerOrders={() => setIsCustomerOrdersOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
-        onLogout={handleLogout}
-        onReplayIntro={() => setShowIntro(true)}
-      />
+      {/* ADMIN DASHBOARD (When Admin is logged in and viewMode is 'admin') */}
+      {isAdmin && viewMode === 'admin' ? (
+        <AdminDashboard
+          products={productsList}
+          orders={orders}
+          categories={CATEGORIES}
+          currentUser={currentUser}
+          onUpdateStatus={handleUpdateOrderStatus}
+          onDeleteOrder={handleDeleteOrder}
+          onUpdateTransport={handleUpdateTransport}
+          onAddProduct={() => setIsAddProductOpen(true)}
+          onEditProduct={(p) => setEditingProduct(p)}
+          onDeleteProduct={handleDeleteProduct}
+          onViewStore={() => setViewMode('store')}
+          onLogout={handleLogout}
+        />
+      ) : (
+        <>
+          {/* FLOATING TOP BAR FOR ADMIN BROWSING THE STOREFRONT */}
+          {isAdmin && (
+            <div className="admin-store-floating-header">
+              <div className="admin-store-banner-inner">
+                <div className="admin-banner-left">
+                  <ShieldCheck size={18} color="#60a5fa" />
+                  <span>
+                    <strong>Paneli i Administratorit Aktiv</strong> — Po shfletoni dyqanin si klient
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button
+                    className="admin-return-dashboard-btn"
+                    onClick={() => setViewMode('admin')}
+                  >
+                    <LayoutDashboard size={15} />
+                    <span>Kthehu te Paneli Admin ↗</span>
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      background: 'transparent',
+                      border: '1px solid #475569',
+                      color: '#cbd5e1',
+                      padding: '5px 12px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.8rem',
+                      fontWeight: '600'
+                    }}
+                  >
+                    Dil (Logout)
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main E-commerce Website */}
+          <Navbar
+            cartCount={cart.reduce((s, i) => s + i.quantity, 0)}
+            wishlistCount={wishlist.length}
+            ordersCount={orders.length}
+            pendingOrdersCount={pendingOrdersCount}
+            currentUser={currentUser}
+            hasClientOrders={hasClientOrders}
+            onOpenCart={() => setIsCartOpen(true)}
+            onOpenWishlist={() => {
+              if (wishlist.length === 0) {
+                alert("Nuk keni ende asnjë produkt në listën e dëshirave. Shtypni ikonën e zemrës tek produktet për t'i ruajtur!");
+              } else {
+                alert(`Keni ${wishlist.length} produkte të ruajtura në listën tuaj të dëshirave!`);
+              }
+            }}
+            onOpenOrders={() => setViewMode('admin')}
+            onOpenCustomerOrders={() => setIsCustomerOrdersOpen(true)}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            onLogout={handleLogout}
+            onReplayIntro={() => setShowIntro(true)}
+          />
 
       {/* LIVE BANNER FOR CUSTOMER: Shown when their order is ON THE WAY! */}
       {onTheWayOrderForBanner && (
@@ -451,23 +508,25 @@ function App() {
 
       {/* Footer */}
       <Footer />
+    </>
+  )}
 
-      {/* Cart Drawer */}
-      <CartModal
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cart={cart}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemove={handleRemoveFromCart}
-        onProceedToCheckout={() => {
-          if (!currentUser) {
-            setIsCartOpen(false);
-            setIsAuthOpen(true);
-          } else {
-            setIsCheckoutOpen(true);
-          }
-        }}
-      />
+  {/* Cart Drawer */}
+  <CartModal
+    isOpen={isCartOpen && viewMode !== 'admin'}
+    onClose={() => setIsCartOpen(false)}
+    cart={cart}
+    onUpdateQuantity={handleUpdateQuantity}
+    onRemove={handleRemoveFromCart}
+    onProceedToCheckout={() => {
+      if (!currentUser) {
+        setIsCartOpen(false);
+        setIsAuthOpen(true);
+      } else {
+        setIsCheckoutOpen(true);
+      }
+    }}
+  />
 
       {/* Checkout Modal Form (Customer details) */}
       <CheckoutModal

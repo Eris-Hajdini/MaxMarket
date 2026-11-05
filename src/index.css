@@ -4159,3 +4159,72 @@ body {
 .view-my-order-btn:hover {
   transform: translateY(-2px);
 }
+
+/* ── Global Responsiveness Enhancements ── */
+@media (max-width: 768px) {
+  .customer-status-modal {
+    max-height: 94vh;
+    border-radius: 16px;
+  }
+  .customer-status-header {
+    padding: 20px 16px 14px;
+  }
+  .customer-status-header h2 {
+    font-size: 1.25rem;
+  }
+  .client-filter-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .client-filter-tabs .status-tab-btn {
+    flex-shrink: 0;
+  }
+  .customer-orders-body {
+    padding: 14px;
+  }
+  .client-order-tracker-card {
+    padding: 16px;
+  }
+  .delivery-stepper-wrap {
+    padding: 8px 0;
+  }
+  .client-order-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .admin-store-banner-inner {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .client-ontheway-floating-banner .banner-inner {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-modal-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .success-actions-row {
+    flex-direction: column;
+    width: 100%;
+  }
+  .view-my-order-btn,
+  .done-btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
+
