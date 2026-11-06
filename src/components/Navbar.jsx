@@ -57,8 +57,6 @@ export default function Navbar({
             <a href="tel:+38344123456" className="top-link">
               <Phone size={13} /> +383 (44) 123 456
             </a>
-            <span className="divider">|</span>
-            <span className="top-link">Lista e Pajës</span>
           </div>
         </div>
       </div>
@@ -179,18 +177,6 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* Categories secondary bar */}
-      <div className={`categories-subnav ${mobileMenuOpen ? 'mobile-open' : ''}`}>
-        <div className="container subnav-links">
-          <a href="#products-section" className="subnav-link">PRODUKTET</a>
-          <a href="#kitchen" className="subnav-link">KUZHINË</a>
-          <a href="#bedding" className="subnav-link">TEKSTIL & SHTRAT</a>
-          <a href="#decor" className="subnav-link">DEKOR & SALON</a>
-          <a href="#bath" className="subnav-link">BANJË</a>
-          <a href="#paje" className="subnav-link highlight-link">LISTA E PAJËS</a>
-          <a href="#offers" className="subnav-link sale-tag">ZBRITJE %</a>
-        </div>
-      </div>
     </header>
   );
 }

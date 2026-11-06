@@ -193,6 +193,7 @@ function App() {
     setViewMode('store');
     setIsLoginIntro(false);
     setLoginUser(null);
+    setShowIntro(true); // play the logo transition on logout too
   };
 
   // Add Product Handler (Admin)
@@ -395,7 +396,12 @@ function App() {
           onShopNow={() => {
             const el = document.getElementById('products-section');
             if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }} 
+          }}
+          onViewDiscounts={() => {
+            setActiveCategory('offers');
+            const el = document.getElementById('products-section');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
         />
 
         {/* Category Pills Slider / Filter */}
@@ -512,46 +518,6 @@ function App() {
           </div>
         </section>
 
-        {/* Bridal Registry (Lista e Pajës) Highlight Section */}
-        <section className="registry-highlight-section" id="paje">
-          <div className="container">
-            <div className="registry-card">
-              <div className="registry-content">
-                <div className="reg-badge">
-                  <Gift size={16} />
-                  <span>Për Nuset & Çiftet e Reja</span>
-                </div>
-                <h2>Lista e Pajës në MaxMarket</h2>
-                <p>
-                  Përgatitni ambientin tuaj të ri me setet më elegante të enëve, tekstilit të dhomës së gjumit dhe aksesorëve luksozë me konsulencë të personalizuar dhe zbritje speciale.
-                </p>
-                <div className="reg-buttons">
-                  <button className="reg-primary-btn" onClick={() => alert("Krijimi i Listës së Pajës së shpejti!")}>
-                    Krijo Listën e Pajës
-                  </button>
-                  <button className="reg-secondary-btn" onClick={() => alert("Konsulenca falas në numrin: +383 44 123 456")}>
-                    Rezervo Konsulencë Falas
-                  </button>
-                </div>
-              </div>
-              <div className="registry-visual">
-                <div className="reg-image-wrapper">
-                  <img 
-                    src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80" 
-                    alt="Bridal Home Registry" 
-                  />
-                  <div className="floating-discount-tag">
-                    <Percent size={20} />
-                    <div>
-                      <strong>-15% Extra</strong>
-                      <span>në të gjithë pakon</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from 'lucide-react';
 import { HERO_SLIDES } from '../data';
 
-export default function HeroSlider({ onShopNow }) {
+export default function HeroSlider({ onShopNow, onViewDiscounts }) {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
@@ -45,9 +45,14 @@ export default function HeroSlider({ onShopNow }) {
                       <span>{slide.cta}</span>
                       <ArrowRight size={18} />
                     </button>
-                    <a href="#offers" className="hero-secondary-btn">
+                    <button
+                      type="button"
+                      className="hero-secondary-btn"
+                      onClick={onViewDiscounts}
+                      style={{ cursor: 'pointer' }}
+                    >
                       Shiko Zbritjet
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
