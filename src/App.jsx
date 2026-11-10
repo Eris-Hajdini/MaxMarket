@@ -5,6 +5,7 @@ import CategoryCardsStrip from './components/CategoryCardsStrip';
 import ProductCard from './components/ProductCard';
 import TrustFeaturesStrip from './components/TrustFeaturesStrip';
 import CartModal from './components/CartModal';
+import WishlistModal from './components/WishlistModal';
 import QuickViewModal from './components/QuickViewModal';
 import AuthModal from './components/AuthModal';
 import AddProductModal from './components/AddProductModal';
@@ -108,6 +109,7 @@ function App() {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [isCustomerOrdersOpen, setIsCustomerOrdersOpen] = useState(false);
@@ -385,13 +387,7 @@ function App() {
               setSearchQuery('');
             }}
             onOpenCart={() => setIsCartOpen(true)}
-            onOpenWishlist={() => {
-              if (wishlist.length === 0) {
-                alert("Nuk keni ende asnjë produkt në listën e dëshirave. Shtypni ikonën e zemrës tek produktet për t'i ruajtur!");
-              } else {
-                alert(`Keni ${wishlist.length} produkte të ruajtura në listën tuaj të dëshirave!`);
-              }
-            }}
+            onOpenWishlist={() => setIsWishlistOpen(true)}
             onOpenOrders={() => setViewMode('admin')}
             onOpenCustomerOrders={() => setIsCustomerOrdersOpen(true)}
             onOpenAuth={() => setIsAuthOpen(true)}
@@ -568,6 +564,7 @@ function App() {
       {/* MODALS */}
       {isCartOpen && (
         <CartModal
+          isOpen={true}
           cart={cart}
           onClose={() => setIsCartOpen(false)}
           onUpdateQuantity={handleUpdateQuantity}
@@ -583,17 +580,37 @@ function App() {
         />
       )}
 
+      {isWishlistOpen && (
+        <WishlistModal
+          isOpen={true}
+          wishlist={wishlist}
+          onClose={() => setIsWishlistOpen(false)}
+          onRemoveFromWishlist={handleToggleWishlist}
+          onAddToCart={handleAddToCart}
+          onOpenCart={() => {
+            setIsWishlistOpen(false);
+            setIsCartOpen(true);
+          }}
+        />
+      )}
+
       {isCheckoutOpen && (
         <CheckoutModal
+          isOpen={true}
           cart={cart}
           currentUser={currentUser}
           onClose={() => setIsCheckoutOpen(false)}
           onOrderPlaced={handleOrderPlaced}
+          onViewMyOrders={() => {
+            setIsCheckoutOpen(false);
+            setIsCustomerOrdersOpen(true);
+          }}
         />
       )}
 
       {isAuthOpen && (
         <AuthModal
+          isOpen={true}
           onClose={() => setIsAuthOpen(false)}
           onLoginSuccess={handleLoginSuccess}
         />
@@ -601,9 +618,13 @@ function App() {
 
       {quickViewProduct && (
         <QuickViewModal
+          isOpen={true}
           product={quickViewProduct}
           onClose={() => setQuickViewProduct(null)}
           onAddToCart={handleAddToCart}
+          isWishlisted={wishlist.some((item) => item.id === quickViewProduct.id)}
+          onToggleWishlist={handleToggleWishlist}
+          onOpenCart={() => setIsCartOpen(true)}
         />
       )}
 

@@ -1,82 +1,199 @@
 import React from 'react';
-import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
 
-export default function CartModal({ isOpen, onClose, cart, onUpdateQuantity, onRemove, onProceedToCheckout }) {
+export default function CartModal({ 
+  isOpen = true, 
+  onClose, 
+  cart = [], 
+  onUpdateQuantity, 
+  onRemoveFromCart, 
+  onRemove,
+  onCheckout, 
+  onProceedToCheckout 
+}) {
   if (!isOpen) return null;
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const handleRemove = (id) => {
+    if (onRemoveFromCart) onRemoveFromCart(id);
+    else if (onRemove) onRemove(id);
+  };
+
+  const handleProceed = () => {
+    if (onCheckout) onCheckout();
+    else if (onProceedToCheckout) onProceedToCheckout();
+  };
+
+  const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
+  const freeShippingThreshold = 50.0;
+  const isFreeShipping = subtotal >= freeShippingThreshold;
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
+  const shippingCost = isFreeShipping || subtotal === 0 ? 0 : 2.0;
+  const grandTotal = subtotal + shippingCost;
 
   return (
-    <div className="cart-modal-backdrop" onClick={onClose}>
-      <div className="cart-sidebar" onClick={(e) => e.stopPropagation()}>
-        <div className="cart-header">
-          <div className="cart-header-title">
-            <ShoppingBag size={22} className="text-primary" />
-            <h2>Shporta Juaj ({cart.reduce((s, i) => s + i.quantity, 0)})</h2>
+    <div className="clean-modal-backdrop" onClick={onClose}>
+      <div className="clean-drawer-panel right-side" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="clean-drawer-header">
+          <div className="drawer-header-left">
+            <div className="drawer-icon-badge">
+              <ShoppingBag size={20} color="#1e473b" />
+            </div>
+            <div>
+              <h3 className="drawer-title">Shporta e Blerjeve</h3>
+              <span className="drawer-subtitle">{totalItems} {totalItems === 1 ? 'artikull' : 'artikuj'}</span>
+            </div>
           </div>
-          <button className="cart-close-btn" onClick={onClose}>
+          <button 
+            className="clean-drawer-close-btn" 
+            onClick={onClose}
+            aria-label="Mbyll shportën"
+          >
             <X size={20} />
           </button>
         </div>
 
-        <div className="cart-body">
+        {/* Free Shipping Progress Strip */}
+        <div className="shipping-progress-strip">
+          <div className="progress-info-row">
+            <span className="progress-truck-icon">🚚</span>
+            {isFreeShipping ? (
+              <span className="progress-text-success">
+                Urime! Keni fituar <strong>Dërgesë Falas</strong>!
+              </span>
+            ) : (
+              <span className="progress-text">
+                Shtoni edhe <strong>{remainingForFreeShipping.toFixed(2).replace('.', ',')} €</strong> për <strong>Dërgesë Falas</strong>!
+              </span>
+            )}
+          </div>
+          <div className="progress-bar-track">
+            <div 
+              className="progress-bar-fill" 
+              style={{ width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Cart Content */}
+        <div className="clean-drawer-body">
           {cart.length === 0 ? (
-            <div className="cart-empty-state">
-              <div className="empty-cart-icon">🛒</div>
-              <h3>Shporta është e zbrazët</h3>
-              <p>Zbuloni gamën tonë të enëve, tekstileve dhe zbukurimeve shtëpiake.</p>
-              <button className="browse-btn" onClick={onClose}>Eksploro Katalogun</button>
+            <div className="clean-cart-empty">
+              <div className="empty-cart-circle">
+                <ShoppingBag size={48} strokeWidth={1.5} color="#94a3b8" />
+              </div>
+              <h4>Shporta juaj është e zbrazët</h4>
+              <p>Zbuloni setet e enëve, aksesorët e organizimit dhe zbukurimet për shtëpinë tuaj.</p>
+              <button 
+                className="clean-start-shopping-btn"
+                onClick={() => {
+                  onClose();
+                  const el = document.getElementById('products-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                Fillo Blerjet Tani →
+              </button>
             </div>
           ) : (
-            <div className="cart-items-list">
-              {cart.map((item) => (
-                <div key={item.id} className="cart-item-card">
-                  <img src={item.image} alt={item.name} className="cart-item-img" />
-                  <div className="cart-item-info">
-                    <h4 className="cart-item-name">{item.name}</h4>
-                    <span className="cart-item-price">€{item.price.toFixed(2)}</span>
-                    <div className="cart-quantity-row">
-                      <div className="quantity-counter">
-                        <button onClick={() => onUpdateQuantity(item.id, -1)}>-</button>
-                        <span>{item.quantity}</span>
-                        <button onClick={() => onUpdateQuantity(item.id, 1)}>+</button>
+            <div className="clean-cart-items-list">
+              {cart.map((item) => {
+                const qty = item.quantity || 1;
+                const itemTotal = item.price * qty;
+
+                return (
+                  <div key={item.id} className="clean-cart-item-card">
+                    <div className="cart-item-image-wrap">
+                      <img src={item.image} alt={item.name} />
+                    </div>
+
+                    <div className="cart-item-info-col">
+                      <div className="cart-item-top-row">
+                        <h4 className="cart-item-title" title={item.name}>{item.name}</h4>
+                        <button 
+                          className="cart-item-delete-btn"
+                          onClick={() => handleRemove(item.id)}
+                          title="Hiq nga shporta"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
-                      <button 
-                        className="remove-item-btn" 
-                        onClick={() => onRemove(item.id)}
-                        title="Fshij nga shporta"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+
+                      <div className="cart-item-unit-price">
+                        {item.price.toFixed(2).replace('.', ',')} € / copë
+                      </div>
+
+                      <div className="cart-item-bottom-row">
+                        {/* Quantity Counter */}
+                        <div className="clean-qty-stepper">
+                          <button 
+                            className="qty-btn"
+                            onClick={() => onUpdateQuantity(item.id, -1)}
+                            disabled={qty <= 1}
+                            aria-label="Zvogëlo"
+                          >
+                            <Minus size={13} />
+                          </button>
+                          <span className="qty-value">{qty}</span>
+                          <button 
+                            className="qty-btn"
+                            onClick={() => onUpdateQuantity(item.id, 1)}
+                            aria-label="Rrit"
+                          >
+                            <Plus size={13} />
+                          </button>
+                        </div>
+
+                        {/* Item Total */}
+                        <div className="cart-item-total-price">
+                          {itemTotal.toFixed(2).replace('.', ',')} €
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
+        {/* Footer with Totals & Checkout Button */}
         {cart.length > 0 && (
-          <div className="cart-footer">
+          <div className="clean-drawer-footer">
             <div className="cart-summary-line">
-              <span>Transporti:</span>
-              <span className="free-shipping-tag">{total >= 30 ? 'FALAS' : '€2.50'}</span>
+              <span>Nëntotali</span>
+              <strong>{subtotal.toFixed(2).replace('.', ',')} €</strong>
             </div>
-            <div className="cart-total-line">
-              <span>Totali me TVSH:</span>
-              <span className="grand-total">€{(total >= 30 ? total : total + 2.5).toFixed(2)}</span>
+
+            <div className="cart-summary-line">
+              <span>Transporti në Kosovë</span>
+              {isFreeShipping ? (
+                <span className="shipping-free-badge">FALAS</span>
+              ) : (
+                <span>{shippingCost.toFixed(2).replace('.', ',')} €</span>
+              )}
+            </div>
+
+            <div className="cart-summary-divider" />
+
+            <div className="cart-summary-total-line">
+              <span>Totali për Pagesë</span>
+              <strong className="grand-total-amount">{grandTotal.toFixed(2).replace('.', ',')} €</strong>
             </div>
 
             <button 
-              className="checkout-btn" 
-              onClick={() => {
-                onClose();
-                onProceedToCheckout();
-              }}
+              className="clean-checkout-proceed-btn"
+              onClick={handleProceed}
             >
-              <span>Vazhdo te Porosia</span>
-              <ArrowRight size={19} />
+              <span>Vazhdo te Porosia (Checkout)</span>
+              <ArrowRight size={18} />
             </button>
+
+            <div className="cart-security-badge">
+              <ShieldCheck size={14} color="#1e473b" />
+              <span>Pagesë e sigurt gjatë pranimit të porosisë (Cash)</span>
+            </div>
           </div>
         )}
       </div>

@@ -4,7 +4,7 @@ import confetti from 'canvas-confetti';
 
 export default function QuickViewModal({ 
   product, 
-  isOpen, 
+  isOpen = true, 
   onClose, 
   onAddToCart, 
   isWishlisted, 

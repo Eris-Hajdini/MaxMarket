@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle, Truck, Package, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function CheckoutModal({ isOpen, onClose, cart, currentUser, onOrderPlaced, onViewMyOrders }) {
+export default function CheckoutModal({ isOpen = true, onClose, cart, currentUser, onOrderPlaced, onViewMyOrders }) {
   const [name, setName] = useState('');
   const [surname, setSurname] = useState('');
   const [email, setEmail] = useState('');

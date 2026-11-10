@@ -390,6 +390,22 @@ export default function Navbar({
               >
                 Vetëm Ofertat (% Zbritje)
               </button>
+
+              <div style={{ height: '1px', background: '#f1f5f9', margin: '8px 0' }} />
+
+              <button 
+                className="drawer-link"
+                onClick={() => { setMobileMenuOpen(false); onOpenWishlist(); }}
+              >
+                ❤️ Të Preferuarat ({wishlistCount})
+              </button>
+
+              <button 
+                className="drawer-link"
+                onClick={() => { setMobileMenuOpen(false); onOpenCart(); }}
+              >
+                🛒 Shporta ({cartCount})
+              </button>
             </div>
 
             <div className="drawer-footer-actions">
