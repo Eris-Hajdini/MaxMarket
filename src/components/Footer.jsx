@@ -1,130 +1,103 @@
 import React from 'react';
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Send,
-  ShieldCheck, 
-  Truck, 
-  Clock, 
-  CreditCard,
-  Share2,
-  Globe
-} from 'lucide-react';
 
-export default function Footer() {
+export default function Footer({ onSelectCategory }) {
+  const handleCategory = (catId) => {
+    if (onSelectCategory) onSelectCategory(catId);
+    const el = document.getElementById('products-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleHelp = (topic) => {
+    if (topic === 'Dërgesa') {
+      alert("Dërgesa në të gjithë Kosovën realizohet brenda 24-48 orëve. Falas për porosi mbi 50 €!");
+    } else if (topic === 'Kthimet') {
+      alert("Kthimi i produkteve mund të bëhet brenda 14 ditëve nga momenti i pranimit.");
+    } else if (topic === 'Pagesa') {
+      alert("Pagesa kryhet me para në dorë gjatë pranimit të porosisë (Cash on Delivery).");
+    } else if (topic === 'Kontakt') {
+      alert("Kujdesi për klientin: Tel: +383 44 123 456 | Email: info@maxmarket-ks.com");
+    }
+  };
+
   return (
-    <footer className="site-footer">
-      {/* Features Bar */}
-      <div className="footer-features">
-        <div className="container">
-          <div className="features-grid">
-            <div className="feature-item">
-              <div className="feature-icon"><Truck size={24} /></div>
-              <div>
-                <h4>Transport i Shpejtë</h4>
-                <p>Në të gjithë Kosovën & Shqipërinë</p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon"><ShieldCheck size={24} /></div>
-              <div>
-                <h4>Cilësi e Garantuar</h4>
-                <p>100% Produkte origjinale të certifikuara</p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon"><CreditCard size={24} /></div>
-              <div>
-                <h4>Pagesë e Sigurt</h4>
-                <p>Me kartelë ose para në dorë (Cash on Delivery)</p>
-              </div>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon"><Clock size={24} /></div>
-              <div>
-                <h4>Mbështetje 24/7</h4>
-                <p>Kujdesi për klientin gjithmonë pranë jush</p>
-              </div>
-            </div>
+    <footer className="clean-footer-root">
+      <div className="container clean-footer-container">
+        {/* Left Column: Brand & Cities */}
+        <div className="footer-col-brand">
+          <div className="footer-brand-title">
+            MAXMARKET
           </div>
+          <p className="footer-brand-desc">
+            Artikuj për kuzhinën, organizimin dhe dekorin e shtëpisë.
+          </p>
+          <p className="footer-cities-line">
+            Prishtinë · Prizren · Pejë · Gjakovë · Gjilan · Ferizaj · Mitrovicë
+          </p>
+        </div>
+
+        {/* Center Column: BLEJ */}
+        <div className="footer-col-nav">
+          <h4 className="footer-heading">BLEJ</h4>
+          <ul className="footer-links-list">
+            <li>
+              <button onClick={() => handleCategory('kuhinja')}>Kuhinja</button>
+            </li>
+            <li>
+              <button onClick={() => handleCategory('organizim')}>Organizim & Ruajtje</button>
+            </li>
+            <li>
+              <button onClick={() => handleCategory('shtepia')}>Shtëpia</button>
+            </li>
+            <li>
+              <button onClick={() => handleCategory('pastrimi')}>Pastrimi</button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Right Column: NDIHMË */}
+        <div className="footer-col-nav">
+          <h4 className="footer-heading">NDIHMË</h4>
+          <ul className="footer-links-list">
+            <li>
+              <button onClick={() => handleHelp('Dërgesa')}>Dërgesa</button>
+            </li>
+            <li>
+              <button onClick={() => handleHelp('Kthimet')}>Kthimet</button>
+            </li>
+            <li>
+              <button onClick={() => handleHelp('Pagesa')}>Pagesa</button>
+            </li>
+            <li>
+              <button onClick={() => handleHelp('Kontakt')}>Kontakt</button>
+            </li>
+          </ul>
+        </div>
+
+        {/* Decorative Silhouette Illustrations matching screenshot */}
+        <div className="footer-decorative-silhouettes" aria-hidden="true">
+          {/* Spray bottle silhouette */}
+          <svg width="44" height="70" viewBox="0 0 44 70" fill="#a4b59e" opacity="0.35">
+            <rect x="18" y="0" width="8" height="12" rx="2"/>
+            <path d="M14 12H30L27 22H17L14 12Z"/>
+            <path d="M17 22L11 32V66C11 68.2 12.8 70 15 70H29C31.2 70 33 68.2 33 66V32L27 22H17Z"/>
+            <path d="M26 4H38V8H26V4Z"/>
+          </svg>
+
+          {/* Cooking pot / casserole silhouette */}
+          <svg width="68" height="48" viewBox="0 0 68 48" fill="#a4b59e" opacity="0.35">
+            <ellipse cx="34" cy="8" rx="6" ry="3"/>
+            <path d="M12 14C12 12 21.8 10 34 10C46.2 10 56 12 56 14L54 38C54 42.5 45 46 34 46C23 46 14 42.5 14 38L12 14Z"/>
+            {/* Handles */}
+            <path d="M6 18C4 18 2 20 2 22C2 24 4 26 6 26H12V18H6Z"/>
+            <path d="M62 18C64 18 66 20 66 22C66 24 64 26 62 26H56V18H62Z"/>
+          </svg>
         </div>
       </div>
 
-      {/* Main Footer Links */}
-      <div className="footer-main">
-        <div className="container footer-grid">
-          <div className="footer-col brand-col">
-            <div className="footer-logo">
-              <span className="brand-max">MAX</span>
-              <span className="brand-market">MARKET</span>
-            </div>
-            <p className="footer-tagline">
-              Destinacioni juaj numër një për pajisje shtëpiake elegante, tekstile luksoze dhe setet më të bukura për kuzhinë.
-            </p>
-            <div className="footer-contacts">
-              <div className="contact-line">
-                <MapPin size={18} />
-                <span>Rruga B, Prishtinë, Kosovë</span>
-              </div>
-              <div className="contact-line">
-                <Phone size={18} />
-                <span>+383 (44) 123 456 / +383 (49) 789 012</span>
-              </div>
-              <div className="contact-line">
-                <Mail size={18} />
-                <span>info@maxmarket-ks.com</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="footer-col">
-            <h3>Kategoritë</h3>
-            <ul>
-              <li><a href="#kitchen">Kuzhinë & Servirje</a></li>
-              <li><a href="#bedding">Tekstil Shtrati & Mbulesa</a></li>
-              <li><a href="#decor">Dekorime & Aroma Shtëpie</a></li>
-              <li><a href="#bath">Banjë & Pelerina</a></li>
-              <li><a href="#paje">Pakoja e Pajës për Nuse</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h3>Ndihmë & Informacion</h3>
-            <ul>
-              <li><a href="#">Rreth MaxMarket</a></li>
-              <li><a href="#">Kushtet e Blerjes & Dorëzimit</a></li>
-              <li><a href="#">Politika e Kthimit të Mallit</a></li>
-              <li><a href="#">Programi i Pikëve & Loyalty Card</a></li>
-              <li><a href="#">Kontakti & Lokacionet</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col newsletter-col">
-            <h3>Merr Zbritje Ekskluzive</h3>
-            <p>Abonohu në buletinin tonë dhe përfito 10% zbritje në porosinë tënde të parë!</p>
-            <form className="newsletter-form" onSubmit={(e) => { e.preventDefault(); alert("Faleminderit që u abonuat në MaxMarket!"); }}>
-              <input type="email" placeholder="Emaili juaj këtu..." required />
-              <button type="submit" aria-label="Subscribe">
-                <Send size={18} />
-              </button>
-            </form>
-            <div className="social-links">
-              <a href="#" aria-label="Website" className="social-pill"><Globe size={18} /></a>
-              <a href="#" aria-label="Share" className="social-pill"><Share2 size={18} /></a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="footer-bottom">
-        <div className="container bottom-content">
-          <p>© {new Date().getFullYear()} MaxMarket Sh.P.K. Të gjitha të drejtat të rezervuara.</p>
-          <div className="payment-badges">
-            <span className="pay-badge">VISA</span>
-            <span className="pay-badge">Mastercard</span>
-            <span className="pay-badge">Cash on Delivery</span>
-          </div>
+      <div className="clean-footer-bottom">
+        <div className="container bottom-inner">
+          <span>© {new Date().getFullYear()} MaxMarket Sh.p.k. Të gjitha të drejtat e rezervuara.</span>
+          <span>Dizajnuar me stil për çdo shtëpi.</span>
         </div>
       </div>
     </footer>

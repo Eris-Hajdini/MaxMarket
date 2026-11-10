@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { HouseMLogo } from './BrandLogo';
 import {
   Home,
   ShoppingCart,
@@ -174,7 +175,7 @@ export default function AdminDashboard({
         {/* Brand Header */}
         <div className="admin-brand-header">
           <div className="admin-brand-icon">
-            <Home size={28} strokeWidth={2.2} />
+            <HouseMLogo size={28} color="#ffffff" />
           </div>
           <div className="admin-brand-info">
             <h2>MaxMarket</h2>

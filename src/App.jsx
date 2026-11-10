@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
-import HeroSlider from './components/HeroSlider';
-import CategoryBar from './components/CategoryBar';
+import CleanHero from './components/CleanHero';
+import CategoryCardsStrip from './components/CategoryCardsStrip';
 import ProductCard from './components/ProductCard';
+import TrustFeaturesStrip from './components/TrustFeaturesStrip';
 import CartModal from './components/CartModal';
 import QuickViewModal from './components/QuickViewModal';
 import AuthModal from './components/AuthModal';
@@ -16,17 +17,18 @@ import Footer from './components/Footer';
 import LogoIntro from './components/LogoIntro';
 import AdminDashboard from './components/AdminDashboard';
 import { PRODUCTS as initialProducts, CATEGORIES } from './data';
-import { Sparkles, ArrowRight, Gift, Percent, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDashboard } from 'lucide-react';
+import { Sparkles, ArrowRight, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'maxmarket_products_list_v1';
+const STORAGE_KEY = 'maxmarket_products_v3';
 const ORDERS_STORAGE_KEY = 'maxmarket_orders_list_v1';
-const CATEGORIES_STORAGE_KEY = 'maxmarket_categories_list_v1';
+const CATEGORIES_STORAGE_KEY = 'maxmarket_categories_v3';
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
   const [isLoginIntro, setIsLoginIntro] = useState(false);
   const [loginUser, setLoginUser] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Load categories from localStorage if available, otherwise initial CATEGORIES
   const [categoriesList, setCategoriesList] = useState(() => {
@@ -161,7 +163,7 @@ function App() {
     });
   };
 
-  // Login Handler with 5-second logo transition
+  // Login Handler with clean white logo transition
   const handleLoginSuccess = (user) => {
     setLoginUser(user);
     setIsLoginIntro(true);
@@ -261,12 +263,30 @@ function App() {
     );
   };
 
-  // Filter products by category
-  const filteredProducts = activeCategory === 'all'
-    ? productsList
-    : activeCategory === 'offers'
-      ? productsList.filter((p) => p.oldPrice !== null)
-      : productsList.filter((p) => p.category === activeCategory);
+  // Filter products by category and live search query
+  const filteredProducts = productsList.filter((p) => {
+    let matchesCategory = true;
+    if (activeCategory === 'offers') {
+      matchesCategory = p.oldPrice !== null;
+    } else if (activeCategory !== 'all') {
+      matchesCategory = 
+        p.category === activeCategory || 
+        (activeCategory === 'kuhinja' && (p.category === 'kitchen' || p.category === 'kuzhine')) ||
+        (activeCategory === 'shtepia' && (p.category === 'decor' || p.category === 'bedding'));
+    }
+
+    let matchesSearch = true;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      matchesSearch = 
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.sku && p.sku.toLowerCase().includes(q)) ||
+        (p.category && p.category.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q));
+    }
+
+    return matchesCategory && matchesSearch;
+  });
 
   const isAdmin = currentUser && currentUser.role === 'admin';
   const pendingOrdersCount = orders.filter((o) => o.status === 'pending').length;
@@ -283,13 +303,13 @@ function App() {
 
   return (
     <div className="app-root">
-      {/* Big Splash Logo Intro Transition & 5s Login Animation */}
+      {/* Clean White Logo Intro Transition matching screenshot */}
       {showIntro && (
         <LogoIntro
           onFinish={handleFinishIntro}
           isLogin={isLoginIntro}
           loginUser={loginUser}
-          duration={5000}
+          duration={2400}
         />
       )}
 
@@ -349,7 +369,7 @@ function App() {
             </div>
           )}
 
-          {/* Main E-commerce Website */}
+          {/* Clean Navbar matching screenshot */}
           <Navbar
             cartCount={cart.reduce((s, i) => s + i.quantity, 0)}
             wishlistCount={wishlist.length}
@@ -357,6 +377,13 @@ function App() {
             pendingOrdersCount={pendingOrdersCount}
             currentUser={currentUser}
             hasClientOrders={hasClientOrders}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeCategory={activeCategory}
+            onSelectCategory={(catId) => {
+              setActiveCategory(catId);
+              setSearchQuery('');
+            }}
             onOpenCart={() => setIsCartOpen(true)}
             onOpenWishlist={() => {
               if (wishlist.length === 0) {
@@ -372,250 +399,260 @@ function App() {
             onReplayIntro={() => setShowIntro(true)}
           />
 
-      {/* LIVE BANNER FOR CUSTOMER: Shown when their order is ON THE WAY! */}
-      {onTheWayOrderForBanner && (
-        <div className="client-ontheway-floating-banner" onClick={() => setIsCustomerOrdersOpen(true)}>
-          <div className="container banner-inner">
-            <div className="banner-left">
-              <span className="live-pulse-dot"></span>
-              <Truck size={20} className="banner-truck-icon" />
-              <span>
-                <strong>Porosia juaj ({onTheWayOrderForBanner.orderId}) është Rrugës!</strong> Korrieri i MaxMarket po vjen drejt adresës tuaj.
-              </span>
+          {/* LIVE BANNER FOR CUSTOMER: Shown when their order is ON THE WAY! */}
+          {onTheWayOrderForBanner && (
+            <div className="client-ontheway-floating-banner" onClick={() => setIsCustomerOrdersOpen(true)}>
+              <div className="container banner-inner">
+                <div className="banner-left">
+                  <span className="live-pulse-dot"></span>
+                  <Truck size={20} className="banner-truck-icon" />
+                  <span>
+                    <strong>Porosia juaj ({onTheWayOrderForBanner.orderId}) është Rrugës!</strong> Korrieri i MaxMarket po vjen drejt adresës tuaj.
+                  </span>
+                </div>
+                <button className="banner-view-btn">
+                  Gjurmo Porosinë <ArrowRight size={15} />
+                </button>
+              </div>
             </div>
-            <button className="banner-view-btn">
-              Gjurmo Porosinë <ArrowRight size={15} />
-            </button>
-          </div>
-        </div>
+          )}
+
+          <main>
+            {/* Clean Hero Section matching screenshot */}
+            <CleanHero 
+              onShopNow={() => {
+                setActiveCategory('all');
+                setSearchQuery('');
+                const el = document.getElementById('products-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              onViewOffers={() => {
+                setActiveCategory('offers');
+                setSearchQuery('');
+                const el = document.getElementById('products-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
+
+            {/* 4 Category Cards Strip matching screenshot */}
+            <CategoryCardsStrip 
+              activeCategory={activeCategory}
+              onSelectCategory={(catId) => {
+                setActiveCategory(catId);
+                setSearchQuery('');
+              }}
+            />
+
+            {/* "Të preferuarat e javës" (Weekly Favorites) Section matching screenshot */}
+            <section id="products-section" className="clean-favorites-section">
+              <div className="container">
+                {/* Header Row: Title on Left, Link on Right */}
+                <div className="favorites-header-row">
+                  <h2 className="favorites-title">Të preferuarat e javës</h2>
+                  <button 
+                    className="favorites-see-all-btn"
+                    onClick={() => {
+                      setActiveCategory('all');
+                      setSearchQuery('');
+                    }}
+                  >
+                    <span>Shiko të gjitha</span>
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+
+                {/* Filter Tabs matching screenshot */}
+                <div className="favorites-tabs-bar">
+                  {[
+                    { id: 'all', label: 'Të gjitha' },
+                    { id: 'kuhinja', label: 'Kuhinja' },
+                    { id: 'organizim', label: 'Organizim & Ruajtje' },
+                    { id: 'shtepia', label: 'Shtëpia' },
+                    { id: 'offers', label: 'Në ofertë' }
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      className={`favorites-tab-btn ${activeCategory === tab.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setActiveCategory(tab.id);
+                        setSearchQuery('');
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}
+                {isAdmin && (
+                  <div className="admin-actions-bar">
+                    <div className="admin-badge-indicator">
+                      <ShieldCheck size={16} />
+                      <span>Paneli Admin</span>
+                    </div>
+
+                    <button 
+                      className="add-product-main-btn"
+                      onClick={() => setIsAddProductOpen(true)}
+                      id="shto-produktin-btn"
+                    >
+                      <PlusCircle size={20} />
+                      <span>Shto Produktin+</span>
+                    </button>
+
+                    <button 
+                      className="admin-edit-toggle-btn"
+                      onClick={() => setIsSelectorOpen(true)}
+                      id="admin-edit-btn"
+                      title="Shiko të gjitha produktet dhe zgjidh për editim"
+                    >
+                      <Edit3 size={18} />
+                      <span>Edit</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Live search active indicator */}
+                {searchQuery.trim() && (
+                  <div className="search-active-pill">
+                    <span>Rezultatet për: <strong>"{searchQuery}"</strong> ({filteredProducts.length} produkte)</span>
+                    <button onClick={() => setSearchQuery('')}>✕ Fshij kërkimin</button>
+                  </div>
+                )}
+
+                {/* Products Grid matching screenshot */}
+                {filteredProducts.length > 0 ? (
+                  <div className="clean-products-grid">
+                    {filteredProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        isAdmin={isAdmin}
+                        isWishlisted={wishlist.some((item) => item.id === product.id)}
+                        onToggleWishlist={handleToggleWishlist}
+                        onAddToCart={handleAddToCart}
+                        onQuickView={(p) => setQuickViewProduct(p)}
+                        onEditProduct={(p) => setEditingProduct(p)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="clean-no-products">
+                    <p>Nuk u gjet asnjë produkt për këtë zgjedhje.</p>
+                    <button 
+                      className="clean-reset-filter-btn"
+                      onClick={() => {
+                        setActiveCategory('all');
+                        setSearchQuery('');
+                      }}
+                    >
+                      Shiko të gjitha produktet
+                    </button>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* 3 Trust Features Strip matching screenshot */}
+            <TrustFeaturesStrip />
+          </main>
+
+          {/* Clean Footer matching screenshot */}
+          <Footer onSelectCategory={(catId) => {
+            setActiveCategory(catId);
+            setSearchQuery('');
+          }} />
+        </>
       )}
 
-      <main>
-        {/* Animated Hero Slider */}
-        <HeroSlider 
-          onShopNow={() => {
-            const el = document.getElementById('products-section');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }}
-          onViewDiscounts={() => {
-            setActiveCategory('offers');
-            const el = document.getElementById('products-section');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
+      {/* MODALS */}
+      {isCartOpen && (
+        <CartModal
+          cart={cart}
+          onClose={() => setIsCartOpen(false)}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveFromCart={handleRemoveFromCart}
+          onCheckout={() => {
+            setIsCartOpen(false);
+            if (!currentUser) {
+              setIsAuthOpen(true);
+            } else {
+              setIsCheckoutOpen(true);
+            }
           }}
         />
+      )}
 
-        {/* Category Pills Slider / Filter */}
-        <CategoryBar 
-          activeCategory={activeCategory} 
+      {isCheckoutOpen && (
+        <CheckoutModal
+          cart={cart}
+          currentUser={currentUser}
+          onClose={() => setIsCheckoutOpen(false)}
+          onOrderPlaced={handleOrderPlaced}
+        />
+      )}
+
+      {isAuthOpen && (
+        <AuthModal
+          onClose={() => setIsAuthOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
+      )}
+
+      {quickViewProduct && (
+        <QuickViewModal
+          product={quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+          onAddToCart={handleAddToCart}
+        />
+      )}
+
+      {isAddProductOpen && (
+        <AddProductModal
           categories={categoriesList}
-          onSelectCategory={(catId) => {
-            setActiveCategory(catId);
-            const el = document.getElementById('products-section');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }} 
+          onClose={() => setIsAddProductOpen(false)}
+          onAddProduct={handleAddProduct}
         />
+      )}
 
-        {/* Promotional Banner Strip */}
-        <section className="promo-banner-strip">
-          <div className="container banner-grid">
-            <div className="promo-banner-card card-orange">
-              <div className="promo-content">
-                <span className="promo-tag">OFERTË E LIMITUAR</span>
-                <h3>Setet e Kuzhinës -30%</h3>
-                <p>Porcelan mbretëror dhe vegla gatimi për shtëpinë tuaj.</p>
-                <button 
-                  onClick={() => {
-                    setActiveCategory('kitchen');
-                    const el = document.getElementById('products-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }} 
-                  className="promo-btn"
-                >
-                  Shfleto Kuzhinën <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
+      {editingProduct && (
+        <EditProductModal
+          product={editingProduct}
+          categories={categoriesList}
+          onClose={() => setEditingProduct(null)}
+          onSaveProduct={handleSaveEditedProduct}
+          onDeleteProduct={handleDeleteProduct}
+        />
+      )}
 
-            <div className="promo-banner-card card-blue">
-              <div className="promo-content">
-                <span className="promo-tag">KOLEKSIONI I RI</span>
-                <h3>Tekstil Luksoz Shtrati</h3>
-                <p>100% Pambuk Satina për rehati të pashoqe çdo natë.</p>
-                <button 
-                  onClick={() => {
-                    setActiveCategory('bedding');
-                    const el = document.getElementById('products-section');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }} 
-                  className="promo-btn"
-                >
-                  Zbulo Tekstilin <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+      {isSelectorOpen && (
+        <EditProductSelectorModal
+          products={productsList}
+          onClose={() => setIsSelectorOpen(false)}
+          onSelectProduct={(p) => {
+            setIsSelectorOpen(false);
+            setEditingProduct(p);
+          }}
+        />
+      )}
 
-        {/* Product Grid Section */}
-        <section id="products-section" className="products-section">
-          <div className="container">
-            <div className="section-header-row products-header-with-action">
-              <div>
-                <div className="section-pill">
-                  <Sparkles size={15} />
-                  <span>Koleksionet Tona</span>
-                </div>
-                <h2 className="section-title">Produktet e Zgjedhura për Ju</h2>
-                <p className="section-subtitle">
-                  Elegancë dhe funksionalitet në çdo kënd të shtëpisë tuaj.
-                </p>
-              </div>
+      {isOrdersOpen && (
+        <OrdersModal
+          orders={orders}
+          onClose={() => setIsOrdersOpen(false)}
+          onUpdateStatus={handleUpdateOrderStatus}
+          onDeleteOrder={handleDeleteOrder}
+          onUpdateTransport={handleUpdateTransport}
+        />
+      )}
 
-              {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}
-              {isAdmin && (
-                <div className="admin-actions-bar">
-                  <div className="admin-badge-indicator">
-                    <ShieldCheck size={16} />
-                    <span>Paneli Admin</span>
-                  </div>
-
-                  <button 
-                    className="add-product-main-btn"
-                    onClick={() => setIsAddProductOpen(true)}
-                    id="shto-produktin-btn"
-                  >
-                    <PlusCircle size={20} />
-                    <span>Shto Produktin+</span>
-                  </button>
-
-                  <button 
-                    className="admin-edit-toggle-btn"
-                    onClick={() => setIsSelectorOpen(true)}
-                    id="admin-edit-btn"
-                    title="Shiko të gjitha produktet dhe zgjidh për editim"
-                  >
-                    <Edit3 size={18} />
-                    <span>Edit</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="products-grid">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isAdmin={isAdmin}
-                  isWishlisted={wishlist.some((item) => item.id === product.id)}
-                  onToggleWishlist={handleToggleWishlist}
-                  onAddToCart={handleAddToCart}
-                  onQuickView={(p) => setQuickViewProduct(p)}
-                  onEditProduct={(p) => setEditingProduct(p)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-      </main>
-
-      {/* Footer */}
-      <Footer />
-    </>
-  )}
-
-  {/* Cart Drawer */}
-  <CartModal
-    isOpen={isCartOpen && viewMode !== 'admin'}
-    onClose={() => setIsCartOpen(false)}
-    cart={cart}
-    onUpdateQuantity={handleUpdateQuantity}
-    onRemove={handleRemoveFromCart}
-    onProceedToCheckout={() => {
-      if (!currentUser) {
-        setIsCartOpen(false);
-        setIsAuthOpen(true);
-      } else {
-        setIsCheckoutOpen(true);
-      }
-    }}
-  />
-
-      {/* Checkout Modal Form (Customer details) */}
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        onClose={() => setIsCheckoutOpen(false)}
-        cart={cart}
-        currentUser={currentUser}
-        onOrderPlaced={handleOrderPlaced}
-        onViewMyOrders={() => setIsCustomerOrdersOpen(true)}
-      />
-
-      {/* Admin Orders Modal (Porositë) */}
-      <OrdersModal
-        isOpen={isOrdersOpen}
-        onClose={() => setIsOrdersOpen(false)}
-        orders={orders}
-        onUpdateStatus={handleUpdateOrderStatus}
-        onDeleteOrder={handleDeleteOrder}
-        onUpdateTransport={handleUpdateTransport}
-      />
-
-      {/* Customer Orders Tracking Modal */}
-      <CustomerOrdersModal
-        isOpen={isCustomerOrdersOpen}
-        onClose={() => setIsCustomerOrdersOpen(false)}
-        orders={orders}
-        currentUser={currentUser}
-      />
-
-      {/* Quick View Modal */}
-      <QuickViewModal
-        product={quickViewProduct}
-        isOpen={Boolean(quickViewProduct)}
-        onClose={() => setQuickViewProduct(null)}
-        onAddToCart={handleAddToCart}
-        isWishlisted={quickViewProduct ? wishlist.some((item) => item.id === quickViewProduct.id) : false}
-        onToggleWishlist={handleToggleWishlist}
-        onOpenCart={() => setIsCartOpen(true)}
-      />
-
-      {/* Authentication Modal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        onLoginSuccess={handleLoginSuccess}
-      />
-
-      {/* Add Product Modal (Admin Exclusive) */}
-      <AddProductModal
-        isOpen={isAddProductOpen}
-        onClose={() => setIsAddProductOpen(false)}
-        onAddProduct={handleAddProduct}
-        categories={categoriesList}
-      />
-
-      {/* Product Selector Modal for Edit (Admin Exclusive) */}
-      <EditProductSelectorModal
-        isOpen={isSelectorOpen}
-        onClose={() => setIsSelectorOpen(false)}
-        products={productsList}
-        onSelectProductToEdit={(prod) => {
-          setIsSelectorOpen(false);
-          setEditingProduct(prod);
-        }}
-        onDeleteProduct={handleDeleteProduct}
-      />
-
-      {/* Edit Product Modal (Admin Exclusive with Discount field) */}
-      <EditProductModal
-        isOpen={Boolean(editingProduct)}
-        product={editingProduct}
-        onClose={() => setEditingProduct(null)}
-        onSave={handleSaveEditedProduct}
-        onDelete={handleDeleteProduct}
-      />
+      {isCustomerOrdersOpen && currentUser && (
+        <CustomerOrdersModal
+          orders={clientUserOrders}
+          currentUser={currentUser}
+          onClose={() => setIsCustomerOrdersOpen(false)}
+        />
+      )}
     </div>
   );
 }

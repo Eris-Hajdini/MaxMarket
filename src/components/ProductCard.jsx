@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingBag, Eye, Star, Check, Edit3 } from 'lucide-react';
+import { Heart, ShoppingBag, Check, Edit3 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function ProductCard({ 
@@ -18,132 +18,127 @@ export default function ProductCard({
     onAddToCart(product);
     setJustAdded(true);
 
-    // Fire small burst of confetti
     try {
       const rect = e.target.getBoundingClientRect();
       const x = (rect.left + rect.width / 2) / window.innerWidth;
       const y = (rect.top + rect.height / 2) / window.innerHeight;
       confetti({
-        particleCount: 25,
-        spread: 60,
+        particleCount: 22,
+        spread: 55,
         origin: { x, y },
-        colors: ['#E65100', '#FF9800', '#FFD54F']
+        colors: ['#1e473b', '#2d6a4f', '#d8f3dc']
       });
     } catch (err) {}
 
-    setTimeout(() => setJustAdded(false), 1500);
+    setTimeout(() => setJustAdded(false), 1600);
   };
 
+  // Derive SKU if not present
+  const sku = product.sku || (
+    product.category === 'kuhinja' ? `KU-0${product.id + 100}` :
+    product.category === 'organizim' ? `OR-0${product.id + 200}` :
+    product.category === 'shtepia' ? `SH-0${product.id + 300}` :
+    product.category === 'pastrimi' ? `PA-0${product.id + 400}` :
+    `MX-0${product.id + 100}`
+  );
+
+  // Derive discount percent badge if oldPrice is present
+  const discountPercent = product.discountBadge || (
+    product.oldPrice && product.oldPrice > product.price
+      ? `-${Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%`
+      : null
+  );
+
   return (
-    <div className="product-card group" onClick={() => onQuickView(product)}>
-      {/* Image container */}
-      <div className="product-image-box">
+    <div 
+      className="clean-product-card" 
+      onClick={() => onQuickView && onQuickView(product)}
+    >
+      {/* Product Image Area */}
+      <div className="clean-card-image-box">
         <img 
           src={product.image} 
           alt={product.name} 
-          className="product-img" 
+          className="clean-card-img" 
           loading="lazy"
         />
-        
-        {/* Floating badge */}
-        {product.badge && (
-          <span className={`product-badge ${product.badge.includes('Zbritje') || product.badge.includes('Super') ? 'badge-sale' : 'badge-primary'}`}>
-            {product.badge}
+
+        {/* Top-Left Discount Badge matching screenshot */}
+        {discountPercent && (
+          <span className="clean-discount-tag">
+            {discountPercent}
           </span>
         )}
 
-        {/* Floating actions: Admin Edit button or Wishlist/View */}
-        <div className="floating-actions">
-          {isAdmin && (
-            <button 
-              className="action-circle edit-circle-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditProduct(product);
-              }}
-              title="Edito ose Fshij Produktin"
-            >
-              <Edit3 size={17} />
-            </button>
-          )}
+        {/* Top-Right Heart Wishlist Button */}
+        <button 
+          className={`clean-wishlist-circle ${isWishlisted ? 'is-active' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleWishlist(product);
+          }}
+          aria-label={isWishlisted ? "Hiq nga dëshirat" : "Shto në dëshirat"}
+          title={isWishlisted ? "Hiq nga dëshirat" : "Shto në dëshirat"}
+        >
+          <Heart 
+            size={16} 
+            fill={isWishlisted ? "#e53935" : "none"} 
+            color={isWishlisted ? "#e53935" : "#64748b"} 
+          />
+        </button>
 
+        {/* Admin Quick Edit Button */}
+        {isAdmin && (
           <button 
-            className={`action-circle ${isWishlisted ? 'active' : ''}`}
+            className="clean-admin-edit-circle"
             onClick={(e) => {
               e.stopPropagation();
-              onToggleWishlist(product);
+              onEditProduct(product);
             }}
-            title={isWishlisted ? "Hiq nga dëshirat" : "Shto në dëshirat"}
+            title="Ndrysho produktin (Admin)"
           >
-            <Heart size={18} fill={isWishlisted ? "#e53935" : "none"} color={isWishlisted ? "#e53935" : "currentColor"} />
+            <Edit3 size={15} />
           </button>
-          
-          <button 
-            className="action-circle"
-            onClick={(e) => {
-              e.stopPropagation();
-              onQuickView(product);
-            }}
-            title="Pamje e shpejtë"
-          >
-            <Eye size={18} />
-          </button>
-        </div>
+        )}
       </div>
 
-      {/* Product Information */}
-      <div className="product-info">
-        <div className="product-meta">
-          <div className="rating-pill">
-            <Star size={13} fill="#FFB300" color="#FFB300" />
-            <span>{product.rating}</span>
-            <span className="reviews-count">({product.reviews})</span>
-          </div>
-          <span className="cat-slug">{product.category}</span>
+      {/* Product Details Area */}
+      <div className="clean-card-info">
+        <div className="clean-card-sku">
+          {sku}
         </div>
 
-        <h3 className="product-title" title={product.name}>
+        <h3 className="clean-card-title" title={product.name}>
           {product.name}
         </h3>
 
-        {/* If Admin is logged in, show inline "Edit" button */}
-        {isAdmin && (
-          <div className="card-admin-row">
-            <button 
-              className="card-admin-edit-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditProduct(product);
-              }}
-            >
-              <Edit3 size={14} />
-              <span>Edit</span>
-            </button>
-          </div>
-        )}
+        {/* Price Row matching screenshot */}
+        <div className="clean-card-price-row">
+          <span className="clean-current-price">
+            {product.price.toFixed(2).replace('.', ',')} €
+          </span>
+          {product.oldPrice && (
+            <span className="clean-old-price">
+              {product.oldPrice.toFixed(2).replace('.', ',')} €
+            </span>
+          )}
+        </div>
 
-        <div className="product-bottom-row">
-          <div className="price-stack">
-            <span className="current-price">€{product.price.toFixed(2)}</span>
-            {product.oldPrice && (
-              <span className="old-price">€{product.oldPrice.toFixed(2)}</span>
-            )}
-          </div>
-
+        {/* Bottom "Shto në shportë" Button matching screenshot */}
+        <div className="clean-card-action-row">
           <button 
-            className={`add-cart-btn ${justAdded ? 'added' : ''}`}
+            className={`clean-add-cart-btn ${justAdded ? 'added' : ''}`}
             onClick={handleAdd}
-            aria-label="Shto në shportë"
           >
             {justAdded ? (
               <>
-                <Check size={18} />
+                <Check size={16} />
                 <span>U shtua</span>
               </>
             ) : (
               <>
-                <ShoppingBag size={18} />
-                <span>Bli</span>
+                <ShoppingBag size={16} />
+                <span>Shto në shportë</span>
               </>
             )}
           </button>
