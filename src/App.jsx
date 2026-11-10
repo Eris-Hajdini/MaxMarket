@@ -165,11 +165,19 @@ function App() {
     });
   };
 
-  // Login Handler with clean white logo transition
+  // Login Handler: Admin goes straight to Admin page immediately
   const handleLoginSuccess = (user) => {
-    setLoginUser(user);
-    setIsLoginIntro(true);
-    setShowIntro(true);
+    if (user.role === 'admin') {
+      setCurrentUser(user);
+      setViewMode('admin');
+      setShowIntro(false);
+      setIsLoginIntro(false);
+      setLoginUser(null);
+    } else {
+      setLoginUser(user);
+      setIsLoginIntro(true);
+      setShowIntro(true);
+    }
   };
 
   const handleFinishIntro = () => {

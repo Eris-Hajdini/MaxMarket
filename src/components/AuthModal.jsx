@@ -32,14 +32,12 @@ export default function AuthModal({ isOpen = true, onClose, onLoginSuccess }) {
         email: 'admin@maxmarket.com',
         role: 'admin'
       };
-      setSuccessMsg('Mirësevini në Panelin e Administratorit!');
-      setTimeout(() => {
-        onLoginSuccess(adminUser);
-        onClose();
-        setSuccessMsg('');
-        setEmail('');
-        setPassword('');
-      }, 500);
+      // Immediately open admin page without delay
+      onLoginSuccess(adminUser);
+      onClose();
+      setEmail('');
+      setPassword('');
+      setError('');
       return;
     }
 
