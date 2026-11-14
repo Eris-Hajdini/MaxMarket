@@ -111,6 +111,10 @@ function App() {
     });
   };
 
+  const handleDeleteCategory = (catId) => {
+    setCategoriesList((prev) => prev.filter((c) => c.id !== catId));
+  };
+
   // Load products from localStorage if available, otherwise initialProducts
   const [productsList, setProductsList] = useState(() => {
     try {
@@ -445,6 +449,7 @@ function App() {
           onUpdateStock={handleUpdateStock}
           onDeleteProduct={handleDeleteProduct}
           onAddCategory={handleAddCategory}
+          onDeleteCategory={handleDeleteCategory}
           onLogout={handleLogout}
         />
       ) : (

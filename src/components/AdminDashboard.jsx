@@ -53,6 +53,7 @@ export default function AdminDashboard({
   onUpdateStock,
   onDeleteProduct,
   onAddCategory,
+  onDeleteCategory,
   onLogout
 }) {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -901,6 +902,7 @@ export default function AdminDashboard({
                       <th>ID</th>
                       <th>Klienti</th>
                       <th>Kontakt & Qyteti</th>
+                      <th>Artikujt e Porositur</th>
                       <th>Statusi</th>
                       <th>Kompania e Transportit</th>
                       <th>Totali</th>
@@ -910,7 +912,7 @@ export default function AdminDashboard({
                   <tbody>
                     {orders.length === 0 ? (
                       <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', padding: '38px', color: '#64748b' }}>
+                        <td colSpan="8" style={{ textAlign: 'center', padding: '38px', color: '#64748b' }}>
                           Nuk ka asnjë porosi të regjistruar në dyqan.
                         </td>
                       </tr>
@@ -928,6 +930,31 @@ export default function AdminDashboard({
                             <td>
                               <div>{order.city}</div>
                               <small style={{ color: '#64748b' }}>{order.phone}</small>
+                            </td>
+                            <td>
+                              {Array.isArray(order.items) && order.items.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                  {order.items.map((item, i) => (
+                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <img
+                                        src={item.image}
+                                        alt={item.name}
+                                        style={{ width: '34px', height: '34px', borderRadius: '7px', objectFit: 'cover', border: '1px solid #e2e8f0', flexShrink: 0 }}
+                                      />
+                                      <div>
+                                        <div style={{ fontSize: '0.82rem', fontWeight: '700', color: '#0f172a', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                          {item.name}
+                                        </div>
+                                        <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                                          x{item.quantity} — €{(item.price * item.quantity).toFixed(2)}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>—</span>
+                              )}
                             </td>
                             <td>
                               <span className={`status-pill-badge ${order.status === 'completed' ? 'delivered' : order.status === 'on_the_way' ? 'processing' : 'pending'}`}>
@@ -1177,6 +1204,28 @@ export default function AdminDashboard({
                       <span style={{ display: 'inline-block', marginTop: '8px', fontSize: '0.72rem', fontWeight: '700', padding: '2px 8px', borderRadius: '12px', background: '#dcfce7', color: '#16a34a' }}>
                         {cat.badge}
                       </span>
+                    )}
+                    {cat.id !== 'all' && cat.id !== 'offers' && onDeleteCategory && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`A jeni të sigurt që dëshironi të fshini kategorinë "${cat.name}"?`)) {
+                            onDeleteCategory(cat.id);
+                          }
+                        }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '5px',
+                          marginTop: '12px', width: '100%', justifyContent: 'center',
+                          padding: '7px 12px', borderRadius: '9px',
+                          border: '1.5px solid #fecaca', background: '#fff5f5',
+                          color: '#dc2626', fontSize: '0.8rem', fontWeight: '700',
+                          cursor: 'pointer', transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = '#fee2e2'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = '#fff5f5'; }}
+                      >
+                        <Trash2 size={14} />
+                        Fshij Kategorinë
+                      </button>
                     )}
                   </div>
                 ))}
