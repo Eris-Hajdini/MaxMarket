@@ -15,6 +15,7 @@ const PRESET_BADGES = ['E Re', 'Top Brend', 'Më e Shitura', 'Koleksion i Ri', '
 export default function AddProductModal({ isOpen = true, onClose, onAddProduct, categories = [] }) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+  const [stock, setStock] = useState('50');
   const [description, setDescription] = useState('');
   const [photo, setPhoto] = useState('');
   const [category, setCategory] = useState(categories.find(c => c.id !== 'all' && c.id !== 'offers')?.id || 'kuhinja');
@@ -32,9 +33,12 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
 
     const parsedPrice = parseFloat(price);
     if (isNaN(parsedPrice) || parsedPrice <= 0) {
-      setError('Çmimi duhet të jetë një numër pozitiv (psh. 29.90).');
+      setError('Çmimi duhet të jetë një numër pozitiv.');
       return;
     }
+
+    const parsedStock = parseInt(stock);
+    const finalStock = isNaN(parsedStock) || parsedStock < 0 ? 0 : parsedStock;
 
     const finalPhoto = photo.trim() || 'https://images.unsplash.com/photo-1584990347449-3995f32a7629?auto=format&fit=crop&w=800&q=80';
 
@@ -42,6 +46,7 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
       id: Date.now(),
       name: name.trim(),
       price: parsedPrice,
+      stock: finalStock,
       oldPrice: null, // Discounts are managed exclusively in the Discounts section
       description: description.trim(),
       image: finalPhoto,
@@ -62,6 +67,7 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
     // Reset and close
     setName('');
     setPrice('');
+    setStock('50');
     setDescription('');
     setPhoto('');
     setError('');
@@ -103,7 +109,7 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
                 <input
                   type="text"
                   className="modern-input no-icon"
-                  placeholder="psh. Set Pjatash Porcelani Royal Imperial (24 copë)"
+                  placeholder="Emri i plotë i artikullit"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   autoFocus
@@ -112,8 +118,8 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
               </div>
             </div>
 
-            {/* Price & Category (No discount fields here) */}
-            <div className="modern-form-row">
+            {/* Price, Stock & Category */}
+            <div className="modern-form-row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
               <div className="modern-form-group">
                 <label className="modern-label">
                   <DollarSign size={15} /> Çmimi (€) *
@@ -124,9 +130,26 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
                     step="0.01"
                     min="0.1"
                     className="modern-input no-icon"
-                    placeholder="psh. 49.90"
+                    placeholder="0.00"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="modern-form-group">
+                <label className="modern-label">
+                  Stoku (Copë) *
+                </label>
+                <div className="modern-input-wrap">
+                  <input
+                    type="number"
+                    min="0"
+                    className="modern-input no-icon"
+                    placeholder="50"
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
                     required
                   />
                 </div>

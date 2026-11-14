@@ -24,6 +24,7 @@ export default function EditProductModal({
 }) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+  const [stock, setStock] = useState('50');
   const [description, setDescription] = useState('');
   const [photo, setPhoto] = useState('');
   const [category, setCategory] = useState('kuhinja');
@@ -34,6 +35,7 @@ export default function EditProductModal({
     if (product) {
       setName(product.name || '');
       setPrice(product.price ? product.price.toString() : '');
+      setStock(product.stock !== undefined ? product.stock.toString() : '50');
       setDescription(product.description || '');
       setPhoto(product.image || '');
       setCategory(product.category || 'kuhinja');
@@ -58,11 +60,15 @@ export default function EditProductModal({
       return;
     }
 
+    const parsedStock = parseInt(stock);
+    const finalStock = isNaN(parsedStock) || parsedStock < 0 ? 0 : parsedStock;
+
     // Preserve existing discount configuration if set from Discounts section
     const updated = {
       ...product,
       name: name.trim(),
       price: parsedPrice,
+      stock: finalStock,
       // oldPrice remains untouched here (managed strictly in Discounts)
       description: description.trim(),
       image: photo.trim() || product.image,
@@ -135,8 +141,8 @@ export default function EditProductModal({
               </div>
             </div>
 
-            {/* Price & Category (Discount fields removed per request) */}
-            <div className="modern-form-row">
+            {/* Price, Stock & Category (Discount fields removed per request) */}
+            <div className="modern-form-row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
               <div className="modern-form-group">
                 <label className="modern-label">
                   <DollarSign size={15} /> Çmimi Bazë (€) *
@@ -147,9 +153,26 @@ export default function EditProductModal({
                     step="0.01"
                     min="0.1"
                     className="modern-input no-icon"
-                    placeholder="psh. 49.90"
+                    placeholder="0.00"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="modern-form-group">
+                <label className="modern-label">
+                  Stoku (Copë) *
+                </label>
+                <div className="modern-input-wrap">
+                  <input
+                    type="number"
+                    min="0"
+                    className="modern-input no-icon"
+                    placeholder="50"
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
                     required
                   />
                 </div>

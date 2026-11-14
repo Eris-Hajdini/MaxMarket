@@ -242,7 +242,7 @@ export default function DiscountModal({
                     step="0.01"
                     min="0.1"
                     className="modern-input no-icon"
-                    placeholder="psh. 69.90"
+                    placeholder="0.00"
                     value={basePrice}
                     onChange={(e) => handleBasePriceChange(e.target.value)}
                     required
@@ -261,7 +261,7 @@ export default function DiscountModal({
                     step="0.01"
                     min="0.1"
                     className="modern-input no-icon"
-                    placeholder="psh. 49.90"
+                    placeholder="0.00"
                     value={discountPrice}
                     onChange={(e) => handleDiscountPriceChange(e.target.value)}
                     style={{ borderColor: '#fdba74', background: '#fffaf5' }}

@@ -118,13 +118,19 @@ function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
+          return parsed.map((p, idx) => ({
+            ...p,
+            stock: typeof p.stock === 'number' ? p.stock : (35 + ((idx * 9) % 25))
+          }));
         }
       }
     } catch (e) {
       console.error("Could not load stored products", e);
     }
-    return initialProducts;
+    return initialProducts.map((p, idx) => ({
+      ...p,
+      stock: typeof p.stock === 'number' ? p.stock : (35 + ((idx * 9) % 25))
+    }));
   });
 
   // Load orders from localStorage
@@ -292,6 +298,7 @@ function App() {
   };
 
   // Customer places order -> Save immediately to orders list with timestamp & status 'pending'
+  // Also decrements product inventory stock based on the quantity ordered
   const handleOrderPlaced = (orderData) => {
     const formattedDate = new Date().toLocaleDateString('sq-AL', {
       day: 'numeric',
@@ -307,6 +314,28 @@ function App() {
     };
 
     setOrders((prev) => [newOrder, ...prev]);
+
+    // Deduct stock for each ordered item
+    if (Array.isArray(orderData.items) && orderData.items.length > 0) {
+      setProductsList((prev) =>
+        prev.map((prod) => {
+          const orderedItem = orderData.items.find(
+            (item) => String(item.id) === String(prod.id)
+          );
+          if (orderedItem) {
+            const currentStock = typeof prod.stock === 'number' ? prod.stock : 35;
+            const orderedQty = Number(orderedItem.quantity) || 1;
+            const updatedStock = Math.max(0, currentStock - orderedQty);
+            return {
+              ...prod,
+              stock: updatedStock
+            };
+          }
+          return prod;
+        })
+      );
+    }
+
     setCart([]); // Clear bucket after successful order
 
     // If client wasn't logged in, log them in automatically with the email they provided
@@ -317,6 +346,17 @@ function App() {
         role: 'client'
       });
     }
+  };
+
+  // Stock update handler (Admin inventory)
+  const handleUpdateStock = (productId, newStock) => {
+    setProductsList((prev) =>
+      prev.map((item) =>
+        String(item.id) === String(productId)
+          ? { ...item, stock: Math.max(0, parseInt(newStock) || 0) }
+          : item
+      )
+    );
   };
 
   // Admin toggles order status: 'pending', 'on_the_way', 'completed'
@@ -402,6 +442,7 @@ function App() {
           onEditProduct={(p) => setEditingProduct(p)}
           onOpenProductSelector={() => setIsSelectorOpen(true)}
           onSaveProduct={handleSaveEditedProduct}
+          onUpdateStock={handleUpdateStock}
           onDeleteProduct={handleDeleteProduct}
           onAddCategory={handleAddCategory}
           onLogout={handleLogout}
