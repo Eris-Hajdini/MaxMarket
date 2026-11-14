@@ -24,8 +24,10 @@ import {
   Menu,
   Sparkles,
   BarChart3,
-  Plus
+  Plus,
+  Percent
 } from 'lucide-react';
+import DiscountModal from './DiscountModal';
 import '../admin.css';
 
 const TRANSPORT_COMPANIES = [
@@ -47,6 +49,7 @@ export default function AdminDashboard({
   onAddProduct,
   onEditProduct,
   onOpenProductSelector,
+  onSaveProduct,
   onDeleteProduct,
   onAddCategory,
   onLogout
@@ -58,6 +61,26 @@ export default function AdminDashboard({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [dateRange, setDateRange] = useState('Oct 1 – Oct 31, 2026');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+
+  // Discount modal state (Discounts are managed exclusively here)
+  const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
+  const [selectedProductForDiscount, setSelectedProductForDiscount] = useState(null);
+
+  const handleRemoveProductDiscount = (productId) => {
+    const prod = products.find(p => String(p.id) === String(productId));
+    if (!prod) return;
+    if (window.confirm(`A jeni të sigurt që dëshironi të hiqni zbritjen nga "${prod.name}"?`)) {
+      const updated = {
+        ...prod,
+        price: prod.oldPrice ? Number(prod.oldPrice) : prod.price,
+        oldPrice: null,
+        badge: prod.badge && prod.badge.startsWith('-') ? '' : prod.badge
+      };
+      if (onSaveProduct) {
+        onSaveProduct(updated);
+      }
+    }
+  };
 
   // Categories modal state
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -1120,60 +1143,165 @@ export default function AdminDashboard({
             </div>
           )}
 
-          {/* TAB 6: DISCOUNTS */}
+          {/* TAB 6: DISCOUNTS (Discounts are managed exclusively here) */}
           {activeTab === 'discounts' && (
             <div className="dashboard-panel-card">
               <div className="panel-header-row">
-                <h2>Produktet me Zbritje & Oferta</h2>
+                <div>
+                  <h2 style={{ margin: '0 0 6px', fontSize: '1.4rem' }}>Produktet me Zbritje & Oferta</h2>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
+                    Menaxhoni zbritjet, çmimet promovuese dhe ofertat speciale për të gjithë artikujt e dyqanit.
+                  </p>
+                </div>
+
+                <button
+                  className="admin-return-dashboard-btn"
+                  onClick={() => {
+                    setSelectedProductForDiscount(null);
+                    setIsDiscountModalOpen(true);
+                  }}
+                  style={{
+                    padding: '9px 18px',
+                    fontSize: '0.92rem',
+                    background: 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)',
+                    color: '#ffffff',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(234, 88, 12, 0.25)'
+                  }}
+                >
+                  <Tag size={17} />
+                  <span>Apliko Zbritje të Re +</span>
+                </button>
               </div>
-              <div className="table-responsive-container">
-                <table className="admin-orders-table">
-                  <thead>
-                    <tr>
-                      <th>Produkti</th>
-                      <th>Çmimi Aktual</th>
-                      <th>Çmimi Paraprak</th>
-                      <th>Kursimi</th>
-                      <th>Veprim</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.filter(p => p.oldPrice).map((p) => (
-                      <tr key={p.id}>
-                        <td>
-                          <strong>{p.name}</strong>
-                        </td>
-                        <td><strong>€{p.price.toFixed(2)}</strong></td>
-                        <td><del style={{ color: '#94a3b8' }}>€{p.oldPrice.toFixed(2)}</del></td>
-                        <td><span className="status-pill-badge delivered">-€{(p.oldPrice - p.price).toFixed(2)}</span></td>
-                        <td>
-                          <button 
-                            className="order-action-dots-btn" 
-                            onClick={() => onEditProduct(p)}
-                            style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '5px',
-                              padding: '5px 10px',
-                              background: '#eff6ff',
-                              color: '#2563eb',
-                              border: '1px solid #bfdbfe',
-                              borderRadius: '6px',
-                              fontWeight: '600',
-                              fontSize: '0.8rem',
-                              cursor: 'pointer'
-                            }}
-                            title="Edito të dhënat e këtij produkti"
-                          >
-                            <Edit3 size={14} color="#2563eb" />
-                            <span>Edito</span>
-                          </button>
-                        </td>
+
+              {products.filter(p => p.oldPrice).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 20px', background: '#f8fafc', borderRadius: '16px', border: '1.5px dashed #cbd5e1', margin: '20px 0' }}>
+                  <Tag size={40} color="#94a3b8" style={{ marginBottom: '12px' }} />
+                  <h3 style={{ margin: '0 0 6px', color: '#0f172a', fontSize: '1.15rem' }}>Nuk ka asnjë produkt me zbritje aktualisht</h3>
+                  <p style={{ margin: '0 0 18px', color: '#64748b', fontSize: '0.88rem' }}>
+                    Vendosni oferta speciale me çmime të reduktuara ose përqindje zbritjeje.
+                  </p>
+                  <button
+                    className="admin-return-dashboard-btn"
+                    onClick={() => {
+                      setSelectedProductForDiscount(null);
+                      setIsDiscountModalOpen(true);
+                    }}
+                    style={{
+                      padding: '9px 20px',
+                      fontSize: '0.9rem',
+                      background: '#ea580c',
+                      color: '#ffffff',
+                      border: 'none'
+                    }}
+                  >
+                    <Plus size={16} />
+                    <span>Apliko Zbritjen e Parë</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="table-responsive-container">
+                  <table className="admin-orders-table">
+                    <thead>
+                      <tr>
+                        <th>Produkti</th>
+                        <th>Kategoria</th>
+                        <th>Çmimi me Zbritje</th>
+                        <th>Çmimi Paraprak</th>
+                        <th>Kursimi / Zbritja</th>
+                        <th>Veprime</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {products.filter(p => p.oldPrice).map((p) => {
+                        const savingsAmount = (p.oldPrice - p.price).toFixed(2);
+                        const discountPercent = Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100);
+                        return (
+                          <tr key={p.id}>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <img
+                                  src={p.image}
+                                  alt={p.name}
+                                  style={{ width: '44px', height: '44px', borderRadius: '8px', objectFit: 'cover' }}
+                                />
+                                <div>
+                                  <strong>{p.name}</strong>
+                                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>ID: #{p.id}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <span style={{ textTransform: 'capitalize' }}>{p.category}</span>
+                            </td>
+                            <td>
+                              <strong style={{ color: '#ea580c', fontSize: '1.05rem' }}>€{p.price.toFixed(2)}</strong>
+                            </td>
+                            <td>
+                              <del style={{ color: '#94a3b8', fontSize: '0.95rem' }}>€{p.oldPrice.toFixed(2)}</del>
+                            </td>
+                            <td>
+                              <span className="status-pill-badge delivered" style={{ background: '#fff7ed', color: '#c2410c', border: '1px solid #fed7aa', fontWeight: '700' }}>
+                                -€{savingsAmount} (-{discountPercent}%)
+                              </span>
+                            </td>
+                            <td>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button
+                                  className="order-action-dots-btn"
+                                  onClick={() => {
+                                    setSelectedProductForDiscount(p);
+                                    setIsDiscountModalOpen(true);
+                                  }}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    padding: '6px 12px',
+                                    background: '#fff7ed',
+                                    color: '#c2410c',
+                                    border: '1px solid #fed7aa',
+                                    borderRadius: '8px',
+                                    fontWeight: '700',
+                                    fontSize: '0.82rem',
+                                    cursor: 'pointer'
+                                  }}
+                                  title="Edito zbritjen e këtij produkti"
+                                >
+                                  <Tag size={14} color="#ea580c" />
+                                  <span>Edito Zbritjen</span>
+                                </button>
+
+                                <button
+                                  className="order-action-dots-btn"
+                                  onClick={() => handleRemoveProductDiscount(p.id)}
+                                  style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    padding: '6px 10px',
+                                    background: '#fef2f2',
+                                    color: '#dc2626',
+                                    border: '1px solid #fecaca',
+                                    borderRadius: '8px',
+                                    fontWeight: '600',
+                                    fontSize: '0.82rem',
+                                    cursor: 'pointer'
+                                  }}
+                                  title="Hiq zbritjen dhe ktheje në çmim normal"
+                                >
+                                  <Trash2 size={14} color="#dc2626" />
+                                  <span>Hiq</span>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
 
@@ -1421,6 +1549,31 @@ export default function AdminDashboard({
             </div>
           </div>
         </div>
+      )}
+
+      {/* DEDICATED DISCOUNT MODAL (Exclusively managed here) */}
+      {isDiscountModalOpen && (
+        <DiscountModal
+          isOpen={true}
+          products={products}
+          initialProduct={selectedProductForDiscount}
+          onClose={() => {
+            setIsDiscountModalOpen(false);
+            setSelectedProductForDiscount(null);
+          }}
+          onSaveDiscount={(updatedProduct) => {
+            if (onSaveProduct) {
+              onSaveProduct(updatedProduct);
+            }
+            setIsDiscountModalOpen(false);
+            setSelectedProductForDiscount(null);
+          }}
+          onRemoveDiscount={(productId) => {
+            handleRemoveProductDiscount(productId);
+            setIsDiscountModalOpen(false);
+            setSelectedProductForDiscount(null);
+          }}
+        />
       )}
     </div>
   );

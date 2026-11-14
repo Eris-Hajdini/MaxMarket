@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Search, Edit3, Trash2, Tag, ArrowRight } from 'lucide-react';
+import { X, Search, Edit3, Trash2, ArrowRight } from 'lucide-react';
 
 export default function EditProductSelectorModal({ 
   isOpen = true, 
@@ -21,34 +21,40 @@ export default function EditProductSelectorModal({
   );
 
   return (
-    <div className="add-product-backdrop" onClick={onClose}>
-      <div className="product-manager-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="add-close-btn" onClick={onClose}>
-          <X size={20} />
-        </button>
-
-        <div className="manager-header">
-          <div className="admin-pill-tag">
+    <div className="modern-modal-backdrop" onClick={onClose}>
+      <div className="modern-modal-card" style={{ maxWidth: '780px', maxHeight: '85vh' }} onClick={(e) => e.stopPropagation()}>
+        <div className="modern-modal-header">
+          <div className="modern-modal-badge blue">
             <Edit3 size={14} /> Menaxhimi i Produkteve
           </div>
-          <h2>Zgjidhni produktin që dëshironi të modifikoni</h2>
-          <p>Këtu mund të shihni të gjitha produktet e dyqanit dhe të zgjidhni cilindo për editim apo fshirje.</p>
+          <h2 className="modern-modal-title">Zgjidhni produktin për modifikim</h2>
+          <p className="modern-modal-subtitle">
+            Kërkoni dhe zgjidhni cilindo produkt për të ndryshuar të dhënat e tij.
+          </p>
+          <button className="modern-modal-close" onClick={onClose} title="Mbyll">
+            <X size={18} />
+          </button>
+        </div>
 
-          <div className="manager-search-box">
-            <Search size={18} className="manager-search-icon" />
+        {/* Search Bar */}
+        <div style={{ padding: '16px 28px 12px', borderBottom: '1px solid #f1f5f9' }}>
+          <div className="modern-input-wrap">
+            <Search size={18} className="modern-input-icon" />
             <input
               type="text"
-              placeholder="Filtro produktet me emër ose kategori..."
+              className="modern-input"
+              placeholder="Filtro me emër ose kategori artikulli..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              autoFocus
             />
-            <span className="count-tag">{filtered.length} produkte</span>
           </div>
         </div>
 
-        <div className="manager-products-list">
+        {/* List of Products */}
+        <div className="manager-products-list" style={{ padding: '16px 28px', flex: 1, overflowY: 'auto' }}>
           {filtered.length === 0 ? (
-            <div className="manager-empty-state">
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
               <p>Nuk u gjet asnjë produkt me këtë kërkim.</p>
             </div>
           ) : (
@@ -65,7 +71,7 @@ export default function EditProductSelectorModal({
                   <div className="manager-item-meta">
                     <span className="cat-chip">{item.category}</span>
                     {item.badge && <span className="badge-chip">{item.badge}</span>}
-                    <span className="desc-preview">{item.description.slice(0, 65)}...</span>
+                    <span className="desc-preview">{item.description.slice(0, 60)}...</span>
                   </div>
                 </div>
 
@@ -76,8 +82,8 @@ export default function EditProductSelectorModal({
                       if (handleSelect) handleSelect(item);
                     }}
                   >
-                    <span>Zgjidh Produktin</span>
-                    <ArrowRight size={16} />
+                    <span>Modifiko</span>
+                    <ArrowRight size={15} />
                   </button>
 
                   <button 

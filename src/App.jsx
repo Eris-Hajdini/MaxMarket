@@ -401,6 +401,7 @@ function App() {
           onAddProduct={() => setIsAddProductOpen(true)}
           onEditProduct={(p) => setEditingProduct(p)}
           onOpenProductSelector={() => setIsSelectorOpen(true)}
+          onSaveProduct={handleSaveEditedProduct}
           onDeleteProduct={handleDeleteProduct}
           onAddCategory={handleAddCategory}
           onLogout={handleLogout}
