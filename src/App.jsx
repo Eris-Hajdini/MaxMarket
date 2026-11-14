@@ -23,13 +23,63 @@ import { Sparkles, ArrowRight, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDash
 const STORAGE_KEY = 'maxmarket_products_v3';
 const ORDERS_STORAGE_KEY = 'maxmarket_orders_list_v1';
 const CATEGORIES_STORAGE_KEY = 'maxmarket_categories_v3';
+const USER_STORAGE_KEY = 'maxmarket_auth_user_v2';
+const VIEW_MODE_STORAGE_KEY = 'maxmarket_auth_view_v2';
 
 function App() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem(USER_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return null;
+  });
+
+  const [viewMode, setViewMode] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        if (parsed?.role === 'admin') return 'admin';
+      }
+      const savedMode = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+      if (savedMode) return savedMode;
+    } catch (e) {}
+    return 'store';
+  });
+
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem(USER_STORAGE_KEY);
+      if (savedUser) {
+        const parsed = JSON.parse(savedUser);
+        if (parsed?.role === 'admin') return false;
+      }
+    } catch (e) {}
+    return true;
+  });
+
   const [isLoginIntro, setIsLoginIntro] = useState(false);
   const [loginUser, setLoginUser] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Persist user & view mode
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem(USER_STORAGE_KEY);
+      }
+    } catch (e) {}
+  }, [currentUser]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, viewMode);
+    } catch (e) {}
+  }, [viewMode]);
 
   // Load categories from localStorage if available, otherwise initial CATEGORIES
   const [categoriesList, setCategoriesList] = useState(() => {
@@ -55,7 +105,10 @@ function App() {
   }, [categoriesList]);
 
   const handleAddCategory = (newCat) => {
-    setCategoriesList((prev) => [...prev, newCat]);
+    setCategoriesList((prev) => {
+      if (prev.some((c) => c.id === newCat.id)) return prev;
+      return [...prev, newCat];
+    });
   };
 
   // Load products from localStorage if available, otherwise initialProducts
@@ -116,8 +169,6 @@ function App() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   // Authentication & Admin State
-  const [currentUser, setCurrentUser] = useState(null); // null, { name, email, role: 'admin'|'client' }
-  const [viewMode, setViewMode] = useState('store'); // 'store' | 'admin'
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
@@ -173,10 +224,20 @@ function App() {
       setShowIntro(false);
       setIsLoginIntro(false);
       setLoginUser(null);
+      setIsAuthOpen(false);
+      try {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+        localStorage.setItem(VIEW_MODE_STORAGE_KEY, 'admin');
+      } catch (e) {}
     } else {
       setLoginUser(user);
       setIsLoginIntro(true);
       setShowIntro(true);
+      setIsAuthOpen(false);
+      try {
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+        localStorage.setItem(VIEW_MODE_STORAGE_KEY, 'store');
+      } catch (e) {}
     }
   };
 
@@ -206,6 +267,10 @@ function App() {
     setIsLoginIntro(false);
     setLoginUser(null);
     setShowIntro(true); // play the logo transition on logout too
+    try {
+      localStorage.removeItem(USER_STORAGE_KEY);
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, 'store');
+    } catch (e) {}
   };
 
   // Add Product Handler (Admin)
@@ -216,14 +281,14 @@ function App() {
   // Edit Product Handler (Admin)
   const handleSaveEditedProduct = (updatedProduct) => {
     setProductsList((prev) =>
-      prev.map((item) => (item.id === updatedProduct.id ? updatedProduct : item))
+      prev.map((item) => (String(item.id) === String(updatedProduct.id) ? { ...item, ...updatedProduct } : item))
     );
   };
 
   // Delete Product Handler (Admin)
   const handleDeleteProduct = (productId) => {
-    setProductsList((prev) => prev.filter((item) => item.id !== productId));
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+    setProductsList((prev) => prev.filter((item) => String(item.id) !== String(productId)));
+    setCart((prev) => prev.filter((item) => String(item.id) !== String(productId)));
   };
 
   // Customer places order -> Save immediately to orders list with timestamp & status 'pending'
@@ -335,6 +400,7 @@ function App() {
           onUpdateTransport={handleUpdateTransport}
           onAddProduct={() => setIsAddProductOpen(true)}
           onEditProduct={(p) => setEditingProduct(p)}
+          onOpenProductSelector={() => setIsSelectorOpen(true)}
           onDeleteProduct={handleDeleteProduct}
           onAddCategory={handleAddCategory}
           onLogout={handleLogout}
@@ -387,6 +453,7 @@ function App() {
             pendingOrdersCount={pendingOrdersCount}
             currentUser={currentUser}
             hasClientOrders={hasClientOrders}
+            categories={categoriesList}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             activeCategory={activeCategory}
@@ -441,18 +508,19 @@ function App() {
             {/* 4 Category Cards Strip matching screenshot */}
             <CategoryCardsStrip 
               activeCategory={activeCategory}
+              categories={categoriesList}
               onSelectCategory={(catId) => {
                 setActiveCategory(catId);
                 setSearchQuery('');
               }}
             />
 
-            {/* "Të preferuarat e javës" (Weekly Favorites) Section matching screenshot */}
+            {/* "Kategoritë" Section matching user request */}
             <section id="products-section" className="clean-favorites-section">
               <div className="container">
                 {/* Header Row: Title on Left, Link on Right */}
                 <div className="favorites-header-row">
-                  <h2 className="favorites-title">Të preferuarat e javës</h2>
+                  <h2 className="favorites-title">Kategoritë</h2>
                   <button 
                     className="favorites-see-all-btn"
                     onClick={() => {
@@ -465,26 +533,42 @@ function App() {
                   </button>
                 </div>
 
-                {/* Filter Tabs matching screenshot */}
+                {/* Filter Tabs dynamically populated with all categories added as admin */}
                 <div className="favorites-tabs-bar">
-                  {[
-                    { id: 'all', label: 'Të gjitha' },
-                    { id: 'kuhinja', label: 'Kuhinja' },
-                    { id: 'organizim', label: 'Organizim & Ruajtje' },
-                    { id: 'shtepia', label: 'Shtëpia' },
-                    { id: 'offers', label: 'Në ofertë' }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      className={`favorites-tab-btn ${activeCategory === tab.id ? 'active' : ''}`}
-                      onClick={() => {
-                        setActiveCategory(tab.id);
-                        setSearchQuery('');
-                      }}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
+                  <button
+                    className={`favorites-tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveCategory('all');
+                      setSearchQuery('');
+                    }}
+                  >
+                    Të gjitha
+                  </button>
+
+                  {categoriesList
+                    .filter((c) => c.id !== 'all' && c.id !== 'offers')
+                    .map((cat) => (
+                      <button
+                        key={cat.id}
+                        className={`favorites-tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                        onClick={() => {
+                          setActiveCategory(cat.id);
+                          setSearchQuery('');
+                        }}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+
+                  <button
+                    className={`favorites-tab-btn ${activeCategory === 'offers' ? 'active' : ''}`}
+                    onClick={() => {
+                      setActiveCategory('offers');
+                      setSearchQuery('');
+                    }}
+                  >
+                    Në ofertë
+                  </button>
                 </div>
 
                 {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}
@@ -562,10 +646,13 @@ function App() {
           </main>
 
           {/* Clean Footer matching screenshot */}
-          <Footer onSelectCategory={(catId) => {
-            setActiveCategory(catId);
-            setSearchQuery('');
-          }} />
+          <Footer 
+            categories={categoriesList}
+            onSelectCategory={(catId) => {
+              setActiveCategory(catId);
+              setSearchQuery('');
+            }} 
+          />
         </>
       )}
 
@@ -646,22 +733,43 @@ function App() {
 
       {editingProduct && (
         <EditProductModal
+          isOpen={true}
           product={editingProduct}
           categories={categoriesList}
           onClose={() => setEditingProduct(null)}
-          onSaveProduct={handleSaveEditedProduct}
-          onDeleteProduct={handleDeleteProduct}
+          onSave={(p) => {
+            handleSaveEditedProduct(p);
+            setEditingProduct(null);
+          }}
+          onSaveProduct={(p) => {
+            handleSaveEditedProduct(p);
+            setEditingProduct(null);
+          }}
+          onDelete={(id) => {
+            handleDeleteProduct(id);
+            setEditingProduct(null);
+          }}
+          onDeleteProduct={(id) => {
+            handleDeleteProduct(id);
+            setEditingProduct(null);
+          }}
         />
       )}
 
       {isSelectorOpen && (
         <EditProductSelectorModal
+          isOpen={true}
           products={productsList}
           onClose={() => setIsSelectorOpen(false)}
           onSelectProduct={(p) => {
             setIsSelectorOpen(false);
             setEditingProduct(p);
           }}
+          onSelectProductToEdit={(p) => {
+            setIsSelectorOpen(false);
+            setEditingProduct(p);
+          }}
+          onDeleteProduct={handleDeleteProduct}
         />
       )}
 

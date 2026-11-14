@@ -47,10 +47,10 @@ body {
 }
 
 .container {
-  width: 100%;
-  max-width: 1240px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 16px;
 }
 
 /* ==========================================================================

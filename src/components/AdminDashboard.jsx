@@ -46,6 +46,7 @@ export default function AdminDashboard({
   onUpdateTransport,
   onAddProduct,
   onEditProduct,
+  onOpenProductSelector,
   onDeleteProduct,
   onAddCategory,
   onLogout
@@ -890,14 +891,26 @@ export default function AdminDashboard({
                   </p>
                 </div>
 
-                <button
-                  className="admin-return-dashboard-btn"
-                  onClick={onAddProduct}
-                  style={{ padding: '9px 18px', fontSize: '0.92rem' }}
-                >
-                  <PlusCircle size={18} />
-                  <span>Shto Produkt të Ri +</span>
-                </button>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {onOpenProductSelector && (
+                    <button
+                      className="admin-return-dashboard-btn"
+                      onClick={onOpenProductSelector}
+                      style={{ padding: '9px 18px', fontSize: '0.92rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}
+                    >
+                      <Edit3 size={17} />
+                      <span>Ndrysho / Edito Produkt ✏️</span>
+                    </button>
+                  )}
+                  <button
+                    className="admin-return-dashboard-btn"
+                    onClick={onAddProduct}
+                    style={{ padding: '9px 18px', fontSize: '0.92rem' }}
+                  >
+                    <PlusCircle size={18} />
+                    <span>Shto Produkt të Ri +</span>
+                  </button>
+                </div>
               </div>
 
               {/* Filters */}
@@ -978,13 +991,27 @@ export default function AdminDashboard({
                             )}
                           </td>
                           <td>
-                            <div style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                               <button
                                 className="order-action-dots-btn"
                                 onClick={() => onEditProduct(product)}
-                                title="Ndrysho produktin"
+                                title="Ndrysho të dhënat e këtij produkti"
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '5px',
+                                  padding: '5px 10px',
+                                  background: '#eff6ff',
+                                  color: '#2563eb',
+                                  border: '1px solid #bfdbfe',
+                                  borderRadius: '6px',
+                                  fontWeight: '600',
+                                  fontSize: '0.8rem',
+                                  cursor: 'pointer'
+                                }}
                               >
-                                <Edit3 size={17} color="#2563eb" />
+                                <Edit3 size={14} color="#2563eb" />
+                                <span>Edito</span>
                               </button>
                               <button
                                 className="order-action-dots-btn"
@@ -995,7 +1022,7 @@ export default function AdminDashboard({
                                 }}
                                 title="Fshij produktin"
                               >
-                                <Trash2 size={17} color="#ef4444" />
+                                <Trash2 size={16} color="#ef4444" />
                               </button>
                             </div>
                           </td>
@@ -1120,8 +1147,26 @@ export default function AdminDashboard({
                         <td><del style={{ color: '#94a3b8' }}>€{p.oldPrice.toFixed(2)}</del></td>
                         <td><span className="status-pill-badge delivered">-€{(p.oldPrice - p.price).toFixed(2)}</span></td>
                         <td>
-                          <button className="order-action-dots-btn" onClick={() => onEditProduct(p)}>
-                            <Edit3 size={16} />
+                          <button 
+                            className="order-action-dots-btn" 
+                            onClick={() => onEditProduct(p)}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              padding: '5px 10px',
+                              background: '#eff6ff',
+                              color: '#2563eb',
+                              border: '1px solid #bfdbfe',
+                              borderRadius: '6px',
+                              fontWeight: '600',
+                              fontSize: '0.8rem',
+                              cursor: 'pointer'
+                            }}
+                            title="Edito të dhënat e këtij produkti"
+                          >
+                            <Edit3 size={14} color="#2563eb" />
+                            <span>Edito</span>
                           </button>
                         </td>
                       </tr>

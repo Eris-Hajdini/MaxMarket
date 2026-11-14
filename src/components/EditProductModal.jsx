@@ -10,13 +10,22 @@ const SAMPLE_IMAGES = [
   { label: 'Peshqirë Banjo', url: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80' }
 ];
 
-export default function EditProductModal({ isOpen, onClose, product, onSave, onDelete }) {
+export default function EditProductModal({ 
+  isOpen = true, 
+  onClose, 
+  product, 
+  onSave, 
+  onSaveProduct,
+  onDelete, 
+  onDeleteProduct,
+  categories = [] 
+}) {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [oldPrice, setOldPrice] = useState('');
   const [description, setDescription] = useState('');
   const [photo, setPhoto] = useState('');
-  const [category, setCategory] = useState('kitchen');
+  const [category, setCategory] = useState('kuhinja');
   const [badge, setBadge] = useState('');
   const [error, setError] = useState('');
 
@@ -27,7 +36,7 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, onD
       setOldPrice(product.oldPrice ? product.oldPrice.toString() : '');
       setDescription(product.description || '');
       setPhoto(product.image || '');
-      setCategory(product.category || 'kitchen');
+      setCategory(product.category || 'kuhinja');
       setBadge(product.badge || '');
       setError('');
     }
@@ -74,7 +83,10 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, onD
       badge: finalBadge
     };
 
-    onSave(updated);
+    const saveFn = onSave || onSaveProduct;
+    if (saveFn) {
+      saveFn(updated);
+    }
 
     try {
       confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
@@ -85,7 +97,10 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, onD
 
   const handleDelete = () => {
     if (window.confirm(`A jeni të sigurt që dëshironi të fshini produktin: "${product.name}"?`)) {
-      onDelete(product.id);
+      const deleteFn = onDelete || onDeleteProduct;
+      if (deleteFn) {
+        deleteFn(product.id);
+      }
       onClose();
     }
   };
@@ -130,10 +145,18 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, onD
             <div className="form-field">
               <label>Kategoria</label>
               <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="kitchen">Kuzhinë & Enë</option>
-                <option value="bedding">Tekstil & Fjetje</option>
-                <option value="decor">Dekor & Living</option>
-                <option value="bath">Banjë & Spa</option>
+                {categories && categories.length > 0 ? (
+                  categories.filter(c => c.id !== 'all' && c.id !== 'offers').map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))
+                ) : (
+                  <>
+                    <option value="kuhinja">Kuhinja</option>
+                    <option value="organizim">Organizim & Ruajtje</option>
+                    <option value="shtepia">Shtëpia</option>
+                    <option value="pastrimi">Pastrimi</option>
+                  </>
+                )}
               </select>
             </div>
           </div>

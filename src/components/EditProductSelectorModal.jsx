@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { X, Search, Edit3, Trash2, Tag, ArrowRight } from 'lucide-react';
 
 export default function EditProductSelectorModal({ 
-  isOpen, 
+  isOpen = true, 
   onClose, 
-  products, 
+  products = [], 
+  onSelectProduct,
   onSelectProductToEdit, 
   onDeleteProduct 
 }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!isOpen) return null;
+
+  const handleSelect = onSelectProduct || onSelectProductToEdit;
 
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,7 +73,7 @@ export default function EditProductSelectorModal({
                   <button 
                     className="select-to-edit-btn"
                     onClick={() => {
-                      onSelectProductToEdit(item);
+                      if (handleSelect) handleSelect(item);
                     }}
                   >
                     <span>Zgjidh Produktin</span>

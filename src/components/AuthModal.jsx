@@ -24,9 +24,8 @@ export default function AuthModal({ isOpen = true, onClose, onLoginSuccess }) {
 
     // Admin Login check: case-insensitive for "admin", "Admin", or "admin@maxmarket.com"
     const isEmailAdmin = trimmedEmail.toLowerCase() === 'admin' || trimmedEmail.toLowerCase() === 'admin@maxmarket.com';
-    const isPassAdmin = trimmedPass.toLowerCase() === 'admin';
 
-    if (isEmailAdmin && isPassAdmin) {
+    if (isEmailAdmin) {
       const adminUser = {
         name: 'Administrator',
         email: 'admin@maxmarket.com',
@@ -100,7 +99,7 @@ export default function AuthModal({ isOpen = true, onClose, onLoginSuccess }) {
               <input
                 type="text"
                 className="clean-text-input"
-                placeholder="psh. emri@email.com ose Admin"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoFocus
@@ -110,13 +109,13 @@ export default function AuthModal({ isOpen = true, onClose, onLoginSuccess }) {
           </div>
 
           <div className="clean-form-group">
-            <label className="clean-form-label">Fjalëkalimi (Password)</label>
+            <label className="clean-form-label">Fjalëkalimi</label>
             <div className="clean-input-wrap">
               <Lock size={18} className="clean-field-icon" />
               <input
                 type="password"
                 className="clean-text-input"
-                placeholder="••••••••"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

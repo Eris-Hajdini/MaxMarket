@@ -21,6 +21,7 @@ export default function Navbar({
   pendingOrdersCount = 0,
   currentUser = null, 
   hasClientOrders = false,
+  categories = [],
   searchQuery = '',
   onSearchChange,
   onSelectCategory,
@@ -55,28 +56,20 @@ export default function Navbar({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const navCategories = [
-    { 
-      id: 'kuhinja', 
-      label: 'Kuhinja',
-      subitems: ['Sete enësh qelqi', 'Tiganë & Tenxhere', 'Vegla gatimi', 'Kristal & Servirje']
-    },
-    { 
-      id: 'organizim', 
-      label: 'Organizim & Ruajtje',
-      subitems: ['Shporta rrobash', 'Organizues kuzhine', 'Kuti & Ndarëse', 'Rafta muri']
-    },
-    { 
-      id: 'shtepia', 
-      label: 'Shtëpia',
-      subitems: ['Vazo dekorative', 'Tekstil & Jastëkë', 'Pllaka druri & Servirje', 'Aromatikë']
-    },
-    { 
-      id: 'pastrimi', 
-      label: 'Pastrimi',
-      subitems: ['Shishe spërkatëse qelqi', 'Lecka mikrofibër organike', 'Furça druri natyrale', 'Kova & Aksesorë']
-    }
-  ];
+  const baseSubitems = {
+    kuhinja: ['Sete enësh qelqi', 'Tiganë & Tenxhere', 'Vegla gatimi', 'Kristal & Servirje'],
+    organizim: ['Shporta rrobash', 'Organizues kuzhine', 'Kuti & Ndarëse', 'Rafta muri'],
+    shtepia: ['Vazo dekorative', 'Tekstil & Jastëkë', 'Pllaka druri & Servirje', 'Aromatikë'],
+    pastrimi: ['Shishe spërkatëse qelqi', 'Lecka mikrofibër organike', 'Furça druri natyrale', 'Kova & Aksesorë']
+  };
+
+  const navCategories = (categories && categories.length > 0 ? categories : [])
+    .filter((c) => c.id !== 'all' && c.id !== 'offers')
+    .map((c) => ({
+      id: c.id,
+      label: c.name,
+      subitems: baseSubitems[c.id] || [`Të gjitha në ${c.name}`, `Artikuj të rinj`, `Ofertat`]
+    }));
 
   const handleCategoryClick = (catId) => {
     if (onSelectCategory) onSelectCategory(catId);
@@ -261,7 +254,9 @@ export default function Navbar({
               <button 
                 className={`clean-action-btn clean-user-btn ${currentUser ? 'user-logged-in' : ''}`}
                 onClick={() => {
-                  if (currentUser) {
+                  if (isAdmin) {
+                    onOpenOrders();
+                  } else if (currentUser) {
                     setUserMenuOpen(!userMenuOpen);
                   } else {
                     onOpenAuth();

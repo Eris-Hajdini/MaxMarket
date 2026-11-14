@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Footer({ onSelectCategory }) {
+export default function Footer({ onSelectCategory, categories = [] }) {
   const handleCategory = (catId) => {
     if (onSelectCategory) onSelectCategory(catId);
     const el = document.getElementById('products-section');
@@ -18,6 +18,15 @@ export default function Footer({ onSelectCategory }) {
       alert("Kujdesi për klientin: Tel: +383 44 123 456 | Email: info@maxmarket-ks.com");
     }
   };
+
+  const dynamicCategories = categories && categories.length > 0
+    ? categories.filter((c) => c.id !== 'all' && c.id !== 'offers')
+    : [
+        { id: 'kuhinja', name: 'Kuhinja' },
+        { id: 'organizim', name: 'Organizim & Ruajtje' },
+        { id: 'shtepia', name: 'Shtëpia' },
+        { id: 'pastrimi', name: 'Pastrimi' }
+      ];
 
   return (
     <footer className="clean-footer-root">
@@ -39,18 +48,11 @@ export default function Footer({ onSelectCategory }) {
         <div className="footer-col-nav">
           <h4 className="footer-heading">BLEJ</h4>
           <ul className="footer-links-list">
-            <li>
-              <button onClick={() => handleCategory('kuhinja')}>Kuhinja</button>
-            </li>
-            <li>
-              <button onClick={() => handleCategory('organizim')}>Organizim & Ruajtje</button>
-            </li>
-            <li>
-              <button onClick={() => handleCategory('shtepia')}>Shtëpia</button>
-            </li>
-            <li>
-              <button onClick={() => handleCategory('pastrimi')}>Pastrimi</button>
-            </li>
+            {dynamicCategories.map((c) => (
+              <li key={c.id}>
+                <button onClick={() => handleCategory(c.id)}>{c.name}</button>
+              </li>
+            ))}
           </ul>
         </div>
 
