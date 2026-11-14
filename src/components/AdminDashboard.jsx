@@ -8,7 +8,6 @@ import {
   Users,
   Tag,
   Boxes,
-  Settings,
   LogOut,
   Calendar,
   ChevronDown,
@@ -341,15 +340,6 @@ export default function AdminDashboard({
             </div>
           </button>
 
-          <button
-            className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('settings'); setSidebarOpen(false); }}
-          >
-            <div className="nav-item-left">
-              <Settings size={19} />
-              <span>Settings</span>
-            </div>
-          </button>
         </nav>
 
         {/* Sidebar Footer with Logout only */}
@@ -390,9 +380,6 @@ export default function AdminDashboard({
 
               {showProfileMenu && (
                 <div className="admin-profile-menu">
-                  <button className="menu-item-btn" onClick={() => setActiveTab('settings')}>
-                    <Settings size={15} /> Cilësimet
-                  </button>
                   <button className="menu-item-btn text-danger" onClick={onLogout}>
                     <LogOut size={15} /> Dil (Logout)
                   </button>
@@ -1664,35 +1651,6 @@ export default function AdminDashboard({
             );
           })()}
 
-          {/* TAB 8: SETTINGS */}
-          {activeTab === 'settings' && (
-            <div className="dashboard-panel-card" style={{ maxWidth: '650px' }}>
-              <div className="panel-header-row">
-                <h2>Cilësimet e Dyqanit</h2>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '6px' }}>Emri i Dyqanit</label>
-                  <input type="text" defaultValue="MaxMarket" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '6px' }}>Email i Kontaktit</label>
-                  <input type="email" defaultValue="support@maxmarket-ks.com" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '6px' }}>Pragu për Dërgesë Falas (€)</label>
-                  <input type="number" defaultValue="30" style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1' }} />
-                </div>
-                <button
-                  className="admin-return-dashboard-btn"
-                  onClick={() => alert("Cilësimet u ruajtën me sukses!")}
-                  style={{ alignSelf: 'flex-start', padding: '10px 20px', marginTop: '10px' }}
-                >
-                  Ruaj Ndryshimet
-                </button>
-              </div>
-            </div>
-          )}
         </main>
       </div>
 
