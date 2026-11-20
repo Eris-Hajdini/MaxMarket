@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 
-export default function LogoIntro({ onFinish, isLogin = false, loginUser = null, duration = 3000 }) {
+export default function LogoIntro({ onFinish, isLogin = false, loginUser = null, duration = 3400 }) {
   const [phase, setPhase] = useState('spin'); // 'spin' -> 'shrink' -> 'logo'
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    // Phase 1: Colorful circle spins for 1.1s
+    // Phase 1: Colorful circle spins slowly 360 degrees for 1.8s
     const t1 = setTimeout(() => {
       setPhase('shrink');
-    }, 1100);
+    }, 1800);
 
-    // Phase 2: Shrinks down and reveals the full MixZone logo at 1.45s
+    // Phase 2: Shrinks and reveals the full MixZone logo at 2.15s
     const t2 = setTimeout(() => {
       setPhase('logo');
-    }, 1450);
+    }, 2150);
 
-    // Phase 3: Transition smoothly into website or admin
-    const totalTime = isLogin ? 3400 : duration;
+    // Phase 3: Transition into store or admin
+    const totalTime = isLogin ? 3700 : duration;
     const t3 = setTimeout(() => {
       triggerFlyTransition();
     }, totalTime);
@@ -44,7 +44,7 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
       title="Kliko për të vazhduar"
     >
       <div className="mz-intro-stage-container">
-        {/* Step 1: Big spinning colorful circle */}
+        {/* Step 1: Spinning colorful circle - 360 degrees, smooth & slow */}
         {(phase === 'spin' || phase === 'shrink') && (
           <div className={`mz-intro-spin-box ${phase === 'shrink' ? 'mz-spin-shrink' : ''}`}>
             <img
@@ -55,7 +55,7 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
           </div>
         )}
 
-        {/* Step 2: Full MixZone logo appears smoothly */}
+        {/* Step 2: Full MixZone logo appears smoothly with Albanian tagline */}
         {phase === 'logo' && (
           <div className="mz-intro-logo-box">
             <img
@@ -64,7 +64,7 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
               className="mz-intro-full-logo"
             />
             <span className="mz-intro-tagline">
-              Everyday essentials for a better home
+              Artikuj thelbësorë për shtëpinë tuaj
             </span>
           </div>
         )}

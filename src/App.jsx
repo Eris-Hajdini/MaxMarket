@@ -20,9 +20,9 @@ import AdminDashboard from './components/AdminDashboard';
 import { PRODUCTS as initialProducts, CATEGORIES } from './data';
 import { Sparkles, ArrowRight, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'mixzone_products_v4';
+const STORAGE_KEY = 'mixzone_products_v5';
 const ORDERS_STORAGE_KEY = 'mixzone_orders_list_v2';
-const CATEGORIES_STORAGE_KEY = 'mixzone_categories_v4';
+const CATEGORIES_STORAGE_KEY = 'mixzone_categories_v5';
 const USER_STORAGE_KEY = 'mixzone_auth_user_v3';
 const VIEW_MODE_STORAGE_KEY = 'mixzone_auth_view_v3';
 
@@ -562,55 +562,55 @@ function App() {
             />
             </div>
 
-            {/* "Popular products" Section */}
+            {/* "Produktet më të pëlqyera" Section */}
             <section id="products-section" className="mz-main-content mz-section-wrap">
               <div className="mz-products-header">
-                  <h2 className="mz-products-title">Popular products</h2>
-                  <button
-                    className="mz-products-viewall"
-                    onClick={() => {
-                      setActiveCategory('all');
-                      setSearchQuery('');
-                    }}
-                  >
-                    View all →
-                  </button>
-                </div>
+                <h2 className="mz-products-title">Produktet më të pëlqyera</h2>
+                <button
+                  className="mz-products-viewall"
+                  onClick={() => {
+                    setActiveCategory('all');
+                    setSearchQuery('');
+                  }}
+                >
+                  Shiko të gjitha →
+                </button>
+              </div>
 
-                {/* Filter Tabs */}
-                <div className="favorites-tabs-bar">
-                  <button
-                    className={`favorites-tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                    onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
-                  >
-                    All
-                  </button>
+              {/* Filter Tabs */}
+              <div className="favorites-tabs-bar">
+                <button
+                  className={`favorites-tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
+                  onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
+                >
+                  Të gjitha
+                </button>
 
-                  {categoriesList
-                    .filter((c) => c.id !== 'all' && c.id !== 'offers')
-                    .map((cat) => (
-                      <button
-                        key={cat.id}
-                        className={`favorites-tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
-                        onClick={() => {
-                          setActiveCategory(cat.id);
-                          setSearchQuery('');
-                        }}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
+                {categoriesList
+                  .filter((c) => c.id !== 'all' && c.id !== 'offers')
+                  .map((cat) => (
+                    <button
+                      key={cat.id}
+                      className={`favorites-tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setActiveCategory(cat.id);
+                        setSearchQuery('');
+                      }}
+                    >
+                      {cat.name}
+                    </button>
+                  ))}
 
-                  <button
-                    className={`favorites-tab-btn ${activeCategory === 'offers' ? 'active' : ''}`}
-                    onClick={() => {
-                      setActiveCategory('offers');
-                      setSearchQuery('');
-                    }}
-                  >
-                    Offers
-                  </button>
-                </div>
+                <button
+                  className={`favorites-tab-btn ${activeCategory === 'offers' ? 'active' : ''}`}
+                  onClick={() => {
+                    setActiveCategory('offers');
+                    setSearchQuery('');
+                  }}
+                >
+                  Ofertat
+                </button>
+              </div>
 
                 {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}
                 {isAdmin && (

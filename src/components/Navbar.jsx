@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, ShoppingBag, User, X, Menu, Heart, LogOut, ShieldCheck, Truck, PackageCheck } from 'lucide-react';
+import { Search, ShoppingBag, User, X, Menu, Heart, LogOut, ShieldCheck, PackageCheck, Sparkles } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 
 export default function Navbar({
@@ -38,14 +38,29 @@ export default function Navbar({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const navLinks = (categories && categories.length > 0 ? categories : [
-    { id: 'kitchen', name: 'Kitchen' },
-    { id: 'home', name: 'Home & Living' },
-    { id: 'storage', name: 'Storage' },
-    { id: 'cleaning', name: 'Cleaning' },
-    { id: 'decor', name: 'Decor' },
-    { id: 'offers', name: 'Offers' }
-  ]).filter(c => c.id !== 'all');
+  // Standard Albanian categories mapping
+  const albanianCategories = [
+    { id: 'kitchen', name: 'Kuzhina' },
+    { id: 'home', name: 'Shtëpia' },
+    { id: 'storage', name: 'Organizim' },
+    { id: 'cleaning', name: 'Pastrimi' },
+    { id: 'decor', name: 'Dekori' },
+    { id: 'offers', name: 'Ofertat' }
+  ];
+
+  const navLinks = (categories && categories.length > 0
+    ? categories.filter(c => c.id !== 'all').map(c => {
+        // Map common IDs to clean Albanian names
+        if (c.id === 'kitchen' || c.id === 'kuhinja') return { ...c, name: 'Kuzhina' };
+        if (c.id === 'home' || c.id === 'shtepia') return { ...c, name: 'Shtëpia' };
+        if (c.id === 'storage' || c.id === 'organizim') return { ...c, name: 'Organizim' };
+        if (c.id === 'cleaning' || c.id === 'pastrimi') return { ...c, name: 'Pastrimi' };
+        if (c.id === 'decor') return { ...c, name: 'Dekori' };
+        if (c.id === 'offers') return { ...c, name: 'Ofertat' };
+        return c;
+      })
+    : albanianCategories
+  );
 
   const handleCategoryClick = (catId) => {
     if (onSelectCategory) onSelectCategory(catId);
@@ -56,11 +71,11 @@ export default function Navbar({
 
   return (
     <header className="mz-header">
-      {/* ── Top black announcement bar ── */}
+      {/* ── Top Announcement Bar (Free delivery removed, Albanian text) ── */}
       <div className="mz-topbar">
         <div className="mz-topbar-left">
-          <Truck size={14} />
-          <span>Free delivery on orders over €50</span>
+          <Sparkles size={13} style={{ color: '#f59e0b' }} />
+          <span>Dërgesa në të gjithë Kosovën • Kthime të thjeshta</span>
         </div>
         <div className="mz-topbar-right">
           {currentUser && !isAdmin && hasClientOrders && (
@@ -70,22 +85,22 @@ export default function Navbar({
           )}
           {isAdmin && (
             <button onClick={onOpenOrders} className="mz-topbar-link">
-              <ShieldCheck size={13} /> Admin Panel
+              <ShieldCheck size={13} /> Paneli Admin
             </button>
           )}
-          <span>Easy returns • Secure checkout</span>
+          <span>Blerje 100% e sigurt</span>
         </div>
       </div>
 
-      {/* ── Main header: logo | search | icons ── */}
+      {/* ── Unified Single Header Bar: Logo | Category Nav Links | Search (Right) | Icons ── */}
       <div className="mz-mainbar">
         <div className="mz-mainbar-inner">
-          {/* Mobile toggle */}
-          <button className="mz-mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          {/* Mobile menu hamburger toggle */}
+          <button className="mz-mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          {/* Logo */}
+          {/* Logo on Left */}
           <div className="mz-logo-wrap">
             <BrandLogo
               size={36}
@@ -96,14 +111,33 @@ export default function Navbar({
             />
           </div>
 
-          {/* Search bar – center */}
-          <div className="mz-search-wrap">
+          {/* Unified Category Navigation Links directly inside Header */}
+          <nav className="mz-unified-nav" aria-label="Kategoritë kryesore">
+            <button
+              className={`mz-nav-link ${activeCategory === 'all' ? 'active' : ''}`}
+              onClick={() => handleCategoryClick('all')}
+            >
+              Kreu
+            </button>
+            {navLinks.map(cat => (
+              <button
+                key={cat.id}
+                className={`mz-nav-link ${activeCategory === cat.id ? 'active' : ''} ${cat.id === 'offers' ? 'offers' : ''}`}
+                onClick={() => handleCategoryClick(cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </nav>
+
+          {/* Search bar pushed to the right */}
+          <div className="mz-search-wrap mz-search-right">
             <Search size={16} className="mz-search-icon" />
             <input
               ref={searchInputRef}
               type="text"
               className="mz-search-input"
-              placeholder="Search for products..."
+              placeholder="Kërko produkte..."
               value={searchQuery}
               onChange={(e) => {
                 if (onSearchChange) onSearchChange(e.target.value);
@@ -114,13 +148,13 @@ export default function Navbar({
               }}
             />
             {searchQuery && (
-              <button className="mz-search-clear" onClick={() => onSearchChange && onSearchChange('')}>
+              <button className="mz-search-clear" onClick={() => onSearchChange && onSearchChange('')} aria-label="Fshij kërkimin">
                 <X size={14} />
               </button>
             )}
           </div>
 
-          {/* Right icons */}
+          {/* User Account, Wishlist & Cart Icons on the far right */}
           <div className="mz-icons-wrap">
             {/* User */}
             <div className="mz-icon-wrap" style={{ position: 'relative' }}>
@@ -129,7 +163,7 @@ export default function Navbar({
                 onClick={() => currentUser ? setUserMenuOpen(!userMenuOpen) : onOpenAuth && onOpenAuth()}
                 title={currentUser ? currentUser.name : 'Hyr / Regjistrohu'}
               >
-                <User size={22} />
+                <User size={21} />
               </button>
               {userMenuOpen && currentUser && (
                 <div className="mz-user-dropdown">
@@ -145,54 +179,31 @@ export default function Navbar({
 
             {/* Wishlist */}
             <button className="mz-icon-btn" onClick={onOpenWishlist} title="Lista e dëshirave">
-              <Heart size={22} />
+              <Heart size={21} />
               {wishlistCount > 0 && <span className="mz-badge">{wishlistCount}</span>}
             </button>
 
             {/* Cart */}
             <button className="mz-icon-btn" onClick={onOpenCart} title="Shporta">
-              <ShoppingBag size={22} />
+              <ShoppingBag size={21} />
               {cartCount > 0 && <span className="mz-badge">{cartCount}</span>}
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── Category nav bar ── */}
-      <div className="mz-catbar">
-        <div className="mz-catbar-inner">
-          {/* Home link */}
-          <button
-            className={`mz-catlink ${activeCategory === 'all' ? 'active' : ''}`}
-            onClick={() => handleCategoryClick('all')}
-          >
-            Home
-          </button>
-          {navLinks.map(cat => (
-            <button
-              key={cat.id}
-              className={`mz-catlink ${activeCategory === cat.id ? 'active' : ''} ${cat.id === 'offers' ? 'offers' : ''}`}
-              onClick={() => handleCategoryClick(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Mobile menu ── */}
+      {/* ── Mobile menu drawer ── */}
       {mobileMenuOpen && (
         <div className="mz-mobile-menu">
-          <button className="mz-catlink" onClick={() => handleCategoryClick('all')}>Home</button>
+          <button className={`mz-catlink ${activeCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>Kreu</button>
           {navLinks.map(cat => (
-            <button key={cat.id} className={`mz-catlink ${cat.id === 'offers' ? 'offers' : ''}`} onClick={() => handleCategoryClick(cat.id)}>
+            <button key={cat.id} className={`mz-catlink ${activeCategory === cat.id ? 'active' : ''} ${cat.id === 'offers' ? 'offers' : ''}`} onClick={() => handleCategoryClick(cat.id)}>
               {cat.name}
             </button>
           ))}
-          {!currentUser && (
+          {!currentUser ? (
             <button className="mz-catlink" onClick={() => { setMobileMenuOpen(false); onOpenAuth && onOpenAuth(); }}>Hyr / Regjistrohu</button>
-          )}
-          {currentUser && (
+          ) : (
             <button className="mz-catlink" onClick={() => { setMobileMenuOpen(false); onLogout && onLogout(); }}>Dil (Logout)</button>
           )}
         </div>

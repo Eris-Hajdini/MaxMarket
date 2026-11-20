@@ -23,7 +23,7 @@ export default function ProductCard({
         particleCount: 22,
         spread: 55,
         origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight },
-        colors: ['#111827', '#f59e0b', '#3b82f6']
+        colors: ['#111827', '#f59e0b', '#ea580c']
       });
     } catch (err) {}
     setTimeout(() => setJustAdded(false), 1600);
@@ -35,7 +35,7 @@ export default function ProductCard({
       : null
   );
 
-  const rating = product.rating || 4.7;
+  const rating = product.rating || 4.8;
   const reviewCount = product.reviews || product.reviewCount || 48;
 
   return (
@@ -51,7 +51,8 @@ export default function ProductCard({
         <button
           className={`mz-pcard-heart ${isWishlisted ? 'active' : ''}`}
           onClick={e => { e.stopPropagation(); onToggleWishlist(product); }}
-          aria-label="Wishlist"
+          aria-label={isWishlisted ? 'Hiq nga dëshirat' : 'Shto në dëshirat'}
+          title={isWishlisted ? 'Hiq nga dëshirat' : 'Shto në dëshirat'}
         >
           <Heart size={16} fill={isWishlisted ? '#e53935' : 'none'} color={isWishlisted ? '#e53935' : '#888'} />
         </button>
@@ -60,14 +61,14 @@ export default function ProductCard({
           <button
             className="mz-pcard-edit"
             onClick={e => { e.stopPropagation(); onEditProduct(product); }}
-            title="Edit product"
+            title="Ndrysho produktin (Admin)"
           >
             <Edit3 size={14} />
           </button>
         )}
       </div>
 
-      {/* Info Area matching reference screenshot */}
+      {/* Info Area */}
       <div className="mz-pcard-info">
         <h3 className="mz-pcard-name" title={product.name}>{product.name}</h3>
 
@@ -98,9 +99,9 @@ export default function ProductCard({
             onClick={handleAdd}
           >
             {justAdded ? (
-              <><Check size={14} /> Added</>
+              <><Check size={14} /> U shtua</>
             ) : (
-              <><ShoppingBag size={14} /> Add to cart</>
+              <><ShoppingBag size={14} /> Shto në shportë</>
             )}
           </button>
         </div>
