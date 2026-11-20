@@ -1,23 +1,38 @@
 import React, { useEffect, useState } from 'react';
 
-export default function LogoIntro({ onFinish, isLogin = false, loginUser = null, duration = 2200 }) {
+export default function LogoIntro({ onFinish, isLogin = false, loginUser = null, duration = 3000 }) {
+  const [phase, setPhase] = useState('spin'); // 'spin' -> 'shrink' -> 'logo'
   const [isExiting, setIsExiting] = useState(false);
 
   useEffect(() => {
-    const stayTime = isLogin ? 2600 : duration;
+    // Phase 1: Colorful circle spins for 1.1s
+    const t1 = setTimeout(() => {
+      setPhase('shrink');
+    }, 1100);
 
-    const timer = setTimeout(() => {
+    // Phase 2: Shrinks down and reveals the full MixZone logo at 1.45s
+    const t2 = setTimeout(() => {
+      setPhase('logo');
+    }, 1450);
+
+    // Phase 3: Transition smoothly into website or admin
+    const totalTime = isLogin ? 3400 : duration;
+    const t3 = setTimeout(() => {
       triggerFlyTransition();
-    }, stayTime);
+    }, totalTime);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [isLogin, duration]);
 
   const triggerFlyTransition = () => {
     setIsExiting(true);
     setTimeout(() => {
       if (onFinish) onFinish();
-    }, 750);
+    }, 650);
   };
 
   const isAdmin = loginUser && loginUser.role === 'admin';
@@ -28,15 +43,31 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
       onClick={triggerFlyTransition}
       title="Kliko për të vazhduar"
     >
-      <div className={`clean-intro-logo-box ${isExiting ? 'glide-to-top-left' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-        <img
-          src="/mixzone-logo.png"
-          alt="MixZone"
-          style={{ height: '72px', maxWidth: '85vw', objectFit: 'contain', display: 'block' }}
-        />
-        <span className="clean-intro-subtitle" style={{ fontSize: '0.95rem', color: '#666', fontWeight: '500' }}>
-          Everyday essentials for a better home
-        </span>
+      <div className="mz-intro-stage-container">
+        {/* Step 1: Big spinning colorful circle */}
+        {(phase === 'spin' || phase === 'shrink') && (
+          <div className={`mz-intro-spin-box ${phase === 'shrink' ? 'mz-spin-shrink' : ''}`}>
+            <img
+              src="/mixzone-icon.png"
+              alt="MixZone Icon"
+              className="mz-intro-spinning-icon"
+            />
+          </div>
+        )}
+
+        {/* Step 2: Full MixZone logo appears smoothly */}
+        {phase === 'logo' && (
+          <div className="mz-intro-logo-box">
+            <img
+              src="/mixzone-logo.png"
+              alt="MixZone"
+              className="mz-intro-full-logo"
+            />
+            <span className="mz-intro-tagline">
+              Everyday essentials for a better home
+            </span>
+          </div>
+        )}
       </div>
 
       {isLogin && !isExiting && (

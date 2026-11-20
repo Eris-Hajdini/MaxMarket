@@ -6843,7 +6843,7 @@ body {
   background: #111;
   color: #fff;
   font-size: 0.78rem;
-  padding: 7px 24px;
+  padding: 8px 2%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -6866,9 +6866,10 @@ body {
   padding: 14px 0;
 }
 .mz-mainbar-inner {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -6883,7 +6884,7 @@ body {
 /* Search bar */
 .mz-search-wrap {
   flex: 1;
-  max-width: 580px;
+  max-width: 680px;
   margin: 0 auto;
   position: relative;
   display: flex;
@@ -6960,9 +6961,10 @@ body {
   border-bottom: 1px solid #e8e8e8;
 }
 .mz-catbar-inner {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   gap: 0;
@@ -7004,11 +7006,12 @@ body {
   overflow: hidden;
 }
 .mz-hero-inner {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  min-height: 340px;
+  min-height: 380px;
 }
 .mz-hero-left {
   display: flex;
@@ -7059,9 +7062,10 @@ body {
 
 /* ── Shop by category ── */
 .mz-cats-section {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 40px auto 0;
-  padding: 0 24px;
+  padding: 0 16px;
 }
 .mz-cats-header {
   display: flex;
@@ -7261,9 +7265,10 @@ body {
   font-family: 'Inter', sans-serif;
 }
 .mz-footer-trust {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 32px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7279,9 +7284,10 @@ body {
   width: 1px; background: #e8e8e8; height: 36px;
 }
 .mz-footer-main {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 40px 24px;
+  padding: 40px 16px;
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
   gap: 40px;
@@ -7312,9 +7318,10 @@ body {
 .mz-footer-links button:hover { color: #111; }
 .mz-footer-bottom {
   border-top: 1px solid #e8e8e8;
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 18px 24px;
+  padding: 18px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -7324,9 +7331,10 @@ body {
 
 /* ── App layout wrapper for products section ── */
 .mz-main-content {
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1720px;
   margin: 0 auto;
-  padding: 0 24px 56px;
+  padding: 0 16px 56px;
 }
 .mz-section-wrap {
   margin-top: 40px;
@@ -7357,4 +7365,104 @@ body {
   .mz-footer-main { grid-template-columns: 1fr; }
   .mz-footer-bottom { flex-direction: column; gap: 4px; text-align: center; }
   .clean-products-grid { grid-template-columns: 1fr; }
+}
+
+
+/* ============================================================
+   MIXZONE SPINNING CIRCLE INTO LOGO INTRO ANIMATION
+   ============================================================ */
+
+.mz-intro-stage-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  position: relative;
+}
+
+.mz-intro-spin-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mzSpinCircle 1.1s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+.mz-intro-spin-box.mz-spin-shrink {
+  animation: mzShrinkCircle 0.38s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.mz-intro-spinning-icon {
+  width: 135px;
+  height: 135px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.15));
+}
+
+.mz-intro-logo-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: mzLogoFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mz-intro-full-logo {
+  height: 86px;
+  max-width: 88vw;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.08));
+}
+
+.mz-intro-tagline {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #4b5563;
+  letter-spacing: -0.2px;
+}
+
+@keyframes mzSpinCircle {
+  0% {
+    transform: rotate(0deg) scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+    transform: rotate(360deg) scale(1.22);
+  }
+  75% {
+    transform: rotate(720deg) scale(1.06);
+  }
+  100% {
+    transform: rotate(1080deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes mzShrinkCircle {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(270deg) scale(0.35);
+    opacity: 0;
+  }
+}
+
+@keyframes mzLogoFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+    filter: blur(8px);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
 }
