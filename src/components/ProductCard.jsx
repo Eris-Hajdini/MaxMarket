@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Heart, ShoppingBag, Check, Edit3 } from 'lucide-react';
+import { Heart, ShoppingBag, Check, Edit3, Star } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
-export default function ProductCard({ 
-  product, 
-  isWishlisted, 
+export default function ProductCard({
+  product,
+  isWishlisted,
   isAdmin,
-  onToggleWishlist, 
-  onAddToCart, 
+  onToggleWishlist,
+  onAddToCart,
   onQuickView,
   onEditProduct
 }) {
@@ -17,129 +17,90 @@ export default function ProductCard({
     e.stopPropagation();
     onAddToCart(product);
     setJustAdded(true);
-
     try {
       const rect = e.target.getBoundingClientRect();
-      const x = (rect.left + rect.width / 2) / window.innerWidth;
-      const y = (rect.top + rect.height / 2) / window.innerHeight;
       confetti({
         particleCount: 22,
         spread: 55,
-        origin: { x, y },
-        colors: ['#1e473b', '#2d6a4f', '#d8f3dc']
+        origin: { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight },
+        colors: ['#111827', '#f59e0b', '#3b82f6']
       });
     } catch (err) {}
-
     setTimeout(() => setJustAdded(false), 1600);
   };
 
-  // Derive SKU if not present
-  const sku = product.sku || (
-    product.category === 'kuhinja' ? `KU-0${product.id + 100}` :
-    product.category === 'organizim' ? `OR-0${product.id + 200}` :
-    product.category === 'shtepia' ? `SH-0${product.id + 300}` :
-    product.category === 'pastrimi' ? `PA-0${product.id + 400}` :
-    `MX-0${product.id + 100}`
-  );
-
-  // Derive discount percent badge if oldPrice is present
   const discountPercent = product.discountBadge || (
     product.oldPrice && product.oldPrice > product.price
       ? `-${Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%`
       : null
   );
 
-  return (
-    <div 
-      className="clean-product-card" 
-      onClick={() => onQuickView && onQuickView(product)}
-    >
-      {/* Product Image Area */}
-      <div className="clean-card-image-box">
-        <img 
-          src={product.image} 
-          alt={product.name} 
-          className="clean-card-img" 
-          loading="lazy"
-        />
+  const rating = product.rating || 4.7;
+  const reviewCount = product.reviews || product.reviewCount || 48;
 
-        {/* Top-Left Discount Badge matching screenshot */}
+  return (
+    <div className="mz-product-card" onClick={() => onQuickView && onQuickView(product)}>
+      {/* Product Image Area */}
+      <div className="mz-pcard-img-wrap">
+        <img src={product.image} alt={product.name} className="mz-pcard-img" loading="lazy" />
+
         {discountPercent && (
-          <span className="clean-discount-tag">
-            {discountPercent}
-          </span>
+          <span className="mz-pcard-badge">{discountPercent}</span>
         )}
 
-        {/* Top-Right Heart Wishlist Button */}
-        <button 
-          className={`clean-wishlist-circle ${isWishlisted ? 'is-active' : ''}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleWishlist(product);
-          }}
-          aria-label={isWishlisted ? "Hiq nga dëshirat" : "Shto në dëshirat"}
-          title={isWishlisted ? "Hiq nga dëshirat" : "Shto në dëshirat"}
+        <button
+          className={`mz-pcard-heart ${isWishlisted ? 'active' : ''}`}
+          onClick={e => { e.stopPropagation(); onToggleWishlist(product); }}
+          aria-label="Wishlist"
         >
-          <Heart 
-            size={16} 
-            fill={isWishlisted ? "#e53935" : "none"} 
-            color={isWishlisted ? "#e53935" : "#64748b"} 
-          />
+          <Heart size={16} fill={isWishlisted ? '#e53935' : 'none'} color={isWishlisted ? '#e53935' : '#888'} />
         </button>
 
-        {/* Admin Quick Edit Button */}
         {isAdmin && (
-          <button 
-            className="clean-admin-edit-circle"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditProduct(product);
-            }}
-            title="Ndrysho produktin (Admin)"
+          <button
+            className="mz-pcard-edit"
+            onClick={e => { e.stopPropagation(); onEditProduct(product); }}
+            title="Edit product"
           >
-            <Edit3 size={15} />
+            <Edit3 size={14} />
           </button>
         )}
       </div>
 
-      {/* Product Details Area */}
-      <div className="clean-card-info">
-        <div className="clean-card-sku">
-          {sku}
-        </div>
+      {/* Info Area matching reference screenshot */}
+      <div className="mz-pcard-info">
+        <h3 className="mz-pcard-name" title={product.name}>{product.name}</h3>
 
-        <h3 className="clean-card-title" title={product.name}>
-          {product.name}
-        </h3>
+        <div className="mz-pcard-bottom-row">
+          <div className="mz-pcard-price-stars">
+            <div className="mz-pcard-price-row">
+              <span className="mz-pcard-price">€{Number(product.price).toFixed(2)}</span>
+              {product.oldPrice && Number(product.oldPrice) > Number(product.price) && (
+                <span className="mz-pcard-old-price">€{Number(product.oldPrice).toFixed(2)}</span>
+              )}
+            </div>
 
-        {/* Price Row matching screenshot */}
-        <div className="clean-card-price-row">
-          <span className="clean-current-price">
-            {product.price.toFixed(2).replace('.', ',')} €
-          </span>
-          {product.oldPrice && (
-            <span className="clean-old-price">
-              {product.oldPrice.toFixed(2).replace('.', ',')} €
-            </span>
-          )}
-        </div>
+            <div className="mz-pcard-stars">
+              {[1, 2, 3, 4, 5].map(i => (
+                <Star
+                  key={i}
+                  size={12}
+                  fill={i <= Math.round(rating) ? '#f59e0b' : 'none'}
+                  color={i <= Math.round(rating) ? '#f59e0b' : '#d1d5db'}
+                />
+              ))}
+              <span className="mz-pcard-rating-text">{rating} ({reviewCount})</span>
+            </div>
+          </div>
 
-        {/* Bottom "Shto në shportë" Button matching screenshot */}
-        <div className="clean-card-action-row">
-          <button 
-            className={`clean-add-cart-btn ${justAdded ? 'added' : ''}`}
+          <button
+            className={`mz-pcard-cart-btn ${justAdded ? 'added' : ''}`}
             onClick={handleAdd}
           >
             {justAdded ? (
-              <>
-                <Check size={16} />
-                <span>U shtua</span>
-              </>
+              <><Check size={14} /> Added</>
             ) : (
-              <>
-                <ShoppingBag size={16} />
-                <span>Shto në shportë</span>
-              </>
+              <><ShoppingBag size={14} /> Add to cart</>
             )}
           </button>
         </div>

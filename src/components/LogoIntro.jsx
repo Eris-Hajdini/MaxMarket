@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { HouseMLogo } from './BrandLogo';
 
 export default function LogoIntro({ onFinish, isLogin = false, loginUser = null, duration = 2200 }) {
   const [isExiting, setIsExiting] = useState(false);
@@ -16,7 +15,6 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
 
   const triggerFlyTransition = () => {
     setIsExiting(true);
-    // Smooth flight duration before unmounting
     setTimeout(() => {
       if (onFinish) onFinish();
     }, 750);
@@ -30,18 +28,17 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
       onClick={triggerFlyTransition}
       title="Kliko për të vazhduar"
     >
-      {/* Big Clean Minimalist Logo Matching Screenshot */}
-      <div className={`clean-intro-logo-box ${isExiting ? 'glide-to-top-left' : ''}`}>
-        <div className="clean-intro-icon-wrap">
-          <HouseMLogo size={64} color="#1b4332" />
-        </div>
-        <div className="clean-intro-text-wrap">
-          <span className="clean-intro-title">MixZone</span>
-          <span className="clean-intro-subtitle">Gjithçka për shtëpinë</span>
-        </div>
+      <div className={`clean-intro-logo-box ${isExiting ? 'glide-to-top-left' : ''}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+        <img
+          src="/mixzone-logo.png"
+          alt="MixZone"
+          style={{ height: '72px', maxWidth: '85vw', objectFit: 'contain', display: 'block' }}
+        />
+        <span className="clean-intro-subtitle" style={{ fontSize: '0.95rem', color: '#666', fontWeight: '500' }}>
+          Everyday essentials for a better home
+        </span>
       </div>
 
-      {/* Subtle clean progress indicator for login */}
       {isLogin && !isExiting && (
         <div className="clean-intro-login-status">
           <div className="clean-intro-progress-bar">

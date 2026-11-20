@@ -20,11 +20,11 @@ import AdminDashboard from './components/AdminDashboard';
 import { PRODUCTS as initialProducts, CATEGORIES } from './data';
 import { Sparkles, ArrowRight, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'MixZone_products_v3';
-const ORDERS_STORAGE_KEY = 'MixZone_orders_list_v1';
-const CATEGORIES_STORAGE_KEY = 'MixZone_categories_v3';
-const USER_STORAGE_KEY = 'MixZone_auth_user_v2';
-const VIEW_MODE_STORAGE_KEY = 'MixZone_auth_view_v2';
+const STORAGE_KEY = 'mixzone_products_v4';
+const ORDERS_STORAGE_KEY = 'mixzone_orders_list_v2';
+const CATEGORIES_STORAGE_KEY = 'mixzone_categories_v4';
+const USER_STORAGE_KEY = 'mixzone_auth_user_v3';
+const VIEW_MODE_STORAGE_KEY = 'mixzone_auth_view_v3';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -562,34 +562,28 @@ function App() {
             />
             </div>
 
-            {/* "Kategoritë" Section matching user request */}
-            <section id="products-section" className="clean-favorites-section">
-              <div className="container">
-                {/* Header Row: Title on Left, Link on Right */}
-                <div className="favorites-header-row">
-                  <h2 className="favorites-title">Kategoritë</h2>
-                  <button 
-                    className="favorites-see-all-btn"
+            {/* "Popular products" Section */}
+            <section id="products-section" className="mz-main-content mz-section-wrap">
+              <div className="mz-products-header">
+                  <h2 className="mz-products-title">Popular products</h2>
+                  <button
+                    className="mz-products-viewall"
                     onClick={() => {
                       setActiveCategory('all');
                       setSearchQuery('');
                     }}
                   >
-                    <span>Shiko të gjitha</span>
-                    <ArrowRight size={16} />
+                    View all →
                   </button>
                 </div>
 
-                {/* Filter Tabs dynamically populated with all categories added as admin */}
+                {/* Filter Tabs */}
                 <div className="favorites-tabs-bar">
                   <button
                     className={`favorites-tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                    onClick={() => {
-                      setActiveCategory('all');
-                      setSearchQuery('');
-                    }}
+                    onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
                   >
-                    Të gjitha
+                    All
                   </button>
 
                   {categoriesList
@@ -614,7 +608,7 @@ function App() {
                       setSearchQuery('');
                     }}
                   >
-                    Në ofertë
+                    Offers
                   </button>
                 </div>
 
@@ -685,15 +679,10 @@ function App() {
                     </button>
                   </div>
                 )}
-              </div>
             </section>
-
-            {/* 3 Trust Features Strip matching screenshot */}
-            <TrustFeaturesStrip />
           </main>
 
-          {/* Clean Footer matching screenshot */}
-          <div id="footer-section">
+          {/* Footer */}
           <Footer 
             categories={categoriesList}
             onSelectCategory={(catId) => {
@@ -701,7 +690,6 @@ function App() {
               setSearchQuery('');
             }} 
           />
-          </div>
         </>
       )}
 

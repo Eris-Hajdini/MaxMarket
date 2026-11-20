@@ -94,7 +94,7 @@ export default function QuickViewModal({
               </div>
               <div className="qv-perk-item">
                 <ShieldCheck size={18} />
-                <span>Garanci cilësie 100% origjinale nga MaxMarket</span>
+                <span>Garanci cilësie 100% origjinale nga MixZone</span>
               </div>
             </div>
           </div>

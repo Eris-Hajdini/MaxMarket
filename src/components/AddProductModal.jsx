@@ -84,7 +84,7 @@ export default function AddProductModal({ isOpen = true, onClose, onAddProduct, 
           </div>
           <h2 className="modern-modal-title">Shto Produkt të Ri</h2>
           <p className="modern-modal-subtitle">
-            Plotësoni të dhënat e artikullit për ta shfaqur menjëherë në dyqanin e MaxMarket.
+            Plotësoni të dhënat e artikullit për ta shfaqur menjëherë në dyqanin e MixZone.
           </p>
           <button className="modern-modal-close" onClick={onClose} title="Mbyll">
             <X size={18} />

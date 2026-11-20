@@ -35,7 +35,7 @@ export default function CustomerOrdersModal({ isOpen, onClose, orders, currentUs
             <Package size={15} /> Porositë e Mia
           </div>
           <h2>Gjurmo Porositë Tuaja</h2>
-          <p>Filtroni dhe ndiqni statusin e dërgesave tuaja nga MaxMarket.</p>
+          <p>Filtroni dhe ndiqni statusin e dërgesave tuaja nga MixZone.</p>
 
           {/* Customer Orders Filter Tabs */}
           <div className="orders-status-tabs client-filter-tabs">
@@ -155,7 +155,7 @@ export default function CustomerOrdersModal({ isOpen, onClose, orders, currentUs
                       <Truck size={20} className="text-orange" />
                       <div>
                         <strong>Kujdes: Porosia juaj po vjen!</strong>
-                        <p>Korrieri i MaxMarket është rrugës drejt adresës: <b>{order.address}, {order.city}</b>. Mbani telefonin hapur ({order.phone}).</p>
+                        <p>Korrieri i MixZone është rrugës drejt adresës: <b>{order.address}, {order.city}</b>. Mbani telefonin hapur ({order.phone}).</p>
                         {order.transportCompany && (
                           <p className="transport-info-client">🚚 Transportohet nga: <strong>{order.transportCompany}</strong></p>
                         )}
