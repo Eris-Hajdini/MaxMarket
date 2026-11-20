@@ -22,13 +22,13 @@ export default function AuthModal({ isOpen = true, onClose, onLoginSuccess }) {
       return;
     }
 
-    // Admin Login check: case-insensitive for "admin", "Admin", or "admin@maxmarket.com"
-    const isEmailAdmin = trimmedEmail.toLowerCase() === 'admin' || trimmedEmail.toLowerCase() === 'admin@maxmarket.com';
+    // Admin Login check: case-insensitive for "admin", "Admin", or "admin@MixZone.com"
+    const isEmailAdmin = trimmedEmail.toLowerCase() === 'admin' || trimmedEmail.toLowerCase() === 'admin@MixZone.com';
 
     if (isEmailAdmin) {
       const adminUser = {
         name: 'Administrator',
-        email: 'admin@maxmarket.com',
+        email: 'admin@MixZone.com',
         role: 'admin'
       };
       // Immediately open admin page without delay
@@ -71,7 +71,7 @@ export default function AuthModal({ isOpen = true, onClose, onLoginSuccess }) {
           <div className="clean-auth-logo-wrap">
             <HouseMLogo size={38} color="#1e473b" />
           </div>
-          <h2 className="clean-auth-title">Kyqu në MaxMarket</h2>
+          <h2 className="clean-auth-title">Kyqu në MixZone</h2>
           <p className="clean-auth-subtitle">
             Hyni në llogarinë tuaj për të parë porositë ose në panelin e administratorit.
           </p>

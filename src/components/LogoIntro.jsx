@@ -36,7 +36,7 @@ export default function LogoIntro({ onFinish, isLogin = false, loginUser = null,
           <HouseMLogo size={64} color="#1b4332" />
         </div>
         <div className="clean-intro-text-wrap">
-          <span className="clean-intro-title">MaxMarket</span>
+          <span className="clean-intro-title">MixZone</span>
           <span className="clean-intro-subtitle">Gjithçka për shtëpinë</span>
         </div>
       </div>

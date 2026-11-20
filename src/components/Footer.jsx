@@ -15,14 +15,14 @@ export default function Footer({ onSelectCategory, categories = [] }) {
     } else if (topic === 'Pagesa') {
       alert("Pagesa kryhet me para në dorë gjatë pranimit të porosisë (Cash on Delivery).");
     } else if (topic === 'Kontakt') {
-      alert("Kujdesi për klientin: Tel: +383 44 123 456 | Email: info@maxmarket-ks.com");
+      alert("Kujdesi për klientin: Tel: +383 44 123 456 | Email: info@MixZone-ks.com");
     }
   };
 
   const dynamicCategories = categories && categories.length > 0
     ? categories.filter((c) => c.id !== 'all' && c.id !== 'offers')
     : [
-        { id: 'kuhinja', name: 'Kuhinja' },
+        { id: 'kuhinja', name: 'Kuzhina' },
         { id: 'organizim', name: 'Organizim & Ruajtje' },
         { id: 'shtepia', name: 'Shtëpia' },
         { id: 'pastrimi', name: 'Pastrimi' }
@@ -34,7 +34,7 @@ export default function Footer({ onSelectCategory, categories = [] }) {
         {/* Left Column: Brand & Cities */}
         <div className="footer-col-brand">
           <div className="footer-brand-title">
-            MAXMARKET
+            MixZone
           </div>
           <p className="footer-brand-desc">
             Artikuj për kuzhinën, organizimin dhe dekorin e shtëpisë.
@@ -98,7 +98,7 @@ export default function Footer({ onSelectCategory, categories = [] }) {
 
       <div className="clean-footer-bottom">
         <div className="container bottom-inner">
-          <span>© {new Date().getFullYear()} MaxMarket Sh.p.k. Të gjitha të drejtat e rezervuara.</span>
+          <span>© {new Date().getFullYear()} MixZone Sh.p.k. Të gjitha të drejtat e rezervuara.</span>
           <span>Dizajnuar me stil për çdo shtëpi.</span>
         </div>
       </div>

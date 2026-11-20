@@ -3,7 +3,6 @@ import {
   Search, 
   ShoppingBag, 
   User, 
-  ChevronDown, 
   X, 
   Menu, 
   Truck, 
@@ -151,58 +150,46 @@ export default function Navbar({
             />
           </div>
 
-          {/* Categories Navigation with Dropdowns */}
+          {/* Static Navigation Links */}
           <nav className="clean-category-nav" aria-label="Main Navigation">
-            {navCategories.map((cat) => {
-              const isActive = activeCategory === cat.id;
-              const isDropdownOpen = activeDropdown === cat.id;
+            {/* Produktet */}
+            <div className="clean-nav-item-wrap">
+              <button
+                className="clean-nav-link"
+                onClick={() => {
+                  const el = document.getElementById('products-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <span>Produktet</span>
+              </button>
+            </div>
 
-              return (
-                <div 
-                  key={cat.id} 
-                  className="clean-nav-item-wrap"
-                  onMouseEnter={() => setActiveDropdown(cat.id)}
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
-                  <button
-                    className={`clean-nav-link ${isActive ? 'is-active' : ''}`}
-                    onClick={() => handleCategoryClick(cat.id)}
-                  >
-                    <span>{cat.label}</span>
-                    <ChevronDown size={14} className={`caret-icon ${isDropdownOpen ? 'rotated' : ''}`} />
-                  </button>
+            {/* Kategoritë */}
+            <div className="clean-nav-item-wrap">
+              <button
+                className="clean-nav-link"
+                onClick={() => {
+                  const el = document.getElementById('categories-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <span>Kategoritë</span>
+              </button>
+            </div>
 
-                  {/* Dropdown Menu on hover/click */}
-                  {isDropdownOpen && (
-                    <div className="clean-nav-dropdown-menu">
-                      <div className="dropdown-header">
-                        <strong>{cat.label}</strong>
-                        <button 
-                          className="dropdown-all-btn"
-                          onClick={() => handleCategoryClick(cat.id)}
-                        >
-                          Shiko të gjitha →
-                        </button>
-                      </div>
-                      <div className="dropdown-subitems-grid">
-                        {cat.subitems.map((sub, idx) => (
-                          <button
-                            key={idx}
-                            className="dropdown-subitem-link"
-                            onClick={() => {
-                              if (onSearchChange) onSearchChange(sub);
-                              handleCategoryClick(cat.id);
-                            }}
-                          >
-                            {sub}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {/* Kontakt */}
+            <div className="clean-nav-item-wrap">
+              <button
+                className="clean-nav-link"
+                onClick={() => {
+                  const el = document.getElementById('footer-section');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <span>Kontakt</span>
+              </button>
+            </div>
           </nav>
 
           {/* Search Bar with '/' Shortcut */}

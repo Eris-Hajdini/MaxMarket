@@ -1,40 +1,52 @@
 import React from 'react';
 
 /**
- * Clean Geometric House + M Logo Icon matching the screenshot exactly
+ * MixZone colorful pinwheel logo icon (SVG recreation of the brand logo)
  */
-export function HouseMLogo({ size = 28, color = 'currentColor', className = '' }) {
+export function MixZoneIcon({ size = 32, className = '' }) {
+  // 8 colorful circles arranged in a pinwheel ring
+  const circles = [
+    { angle: 0,   color: '#FF4444' },   // red
+    { angle: 45,  color: '#FF8C00' },   // orange
+    { angle: 90,  color: '#FFD700' },   // yellow
+    { angle: 135, color: '#32CD32' },   // green
+    { angle: 180, color: '#00BFFF' },   // cyan
+    { angle: 225, color: '#1E90FF' },   // blue
+    { angle: 270, color: '#8A2BE2' },   // purple
+    { angle: 315, color: '#CC00CC' },   // magenta
+  ];
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const ringRadius = size * 0.30;
+  const dotRadius = size * 0.145;
+
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 32 32"
+      viewBox={`0 0 ${size} ${size}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       style={{ display: 'inline-block', verticalAlign: 'middle' }}
     >
-      {/* Outer House Contour */}
-      <path
-        d="M16 3.5L3.5 12.8V27.5C3.5 28.0523 3.94772 28.5 4.5 28.5H27.5C28.0523 28.5 28.5 28.0523 28.5 27.5V12.8L16 3.5Z"
-        stroke={color}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* Internal M shape */}
-      <path
-        d="M9 23.5V15.5L16 21L23 15.5V23.5"
-        stroke={color}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+      {circles.map(({ angle, color }, i) => {
+        const rad = (angle * Math.PI) / 180;
+        const x = cx + ringRadius * Math.cos(rad);
+        const y = cy + ringRadius * Math.sin(rad);
+        return <circle key={i} cx={x} cy={y} r={dotRadius} fill={color} />;
+      })}
     </svg>
   );
 }
 
-export default function BrandLogo({ size = 26, color = '#1a3b32', textColor = '#1a3b32', onClick = null }) {
+// Keep HouseMLogo export for backward compat (LogoIntro uses it)
+export function HouseMLogo({ size = 28, color = 'currentColor', className = '' }) {
+  return <MixZoneIcon size={size} className={className} />;
+}
+
+export default function BrandLogo({ size = 26, color = '#1a3b32', textColor = '#1a1a1a', onClick = null }) {
   return (
     <div
       className="brand-logo-root"
@@ -47,18 +59,18 @@ export default function BrandLogo({ size = 26, color = '#1a3b32', textColor = '#
         userSelect: 'none'
       }}
     >
-      <HouseMLogo size={size} color={color} />
+      <MixZoneIcon size={size + 4} />
       <span
         style={{
           fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-          fontSize: `${size * 0.78}px`,
-          fontWeight: 700,
-          letterSpacing: '-0.3px',
-          color: textColor,
+          fontSize: `${size * 0.85}px`,
+          fontWeight: 800,
+          letterSpacing: '-0.5px',
+          color: '#1a1a1a',
           lineHeight: 1
         }}
       >
-        MaxMarket
+        MixZone
       </span>
     </div>
   );

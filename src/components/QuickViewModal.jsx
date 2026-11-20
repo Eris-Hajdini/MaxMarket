@@ -90,7 +90,7 @@ export default function QuickViewModal({
               </div>
               <div className="qv-perk-item">
                 <RotateCcw size={18} />
-                <span>Kthim falas brenda 14 ditëve pa asnjë komplikim</span>
+
               </div>
               <div className="qv-perk-item">
                 <ShieldCheck size={18} />

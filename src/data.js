@@ -1,6 +1,6 @@
 export const CATEGORIES = [
   { id: 'all', name: 'Të gjitha', icon: 'Sparkles', count: 24 },
-  { id: 'kuhinja', name: 'Kuhinja', icon: 'UtensilsCrossed', count: 8 },
+  { id: 'kuhinja', name: 'Kuzhina', icon: 'UtensilsCrossed', count: 8 },
   { id: 'organizim', name: 'Organizim & Ruajtje', icon: 'Package', count: 7 },
   { id: 'shtepia', name: 'Shtëpia', icon: 'Lamp', count: 5 },
   { id: 'pastrimi', name: 'Pastrimi', icon: 'Sparkles', count: 4 },
@@ -125,7 +125,7 @@ export const PRODUCTS = [
 export const CATEGORY_CARDS = [
   {
     id: 'kuhinja',
-    title: 'Kuhinja',
+    title: 'Kuzhina',
     image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80'
   },
   {

@@ -261,7 +261,7 @@ export default function AdminDashboard({
             <HouseMLogo size={28} color="#ffffff" />
           </div>
           <div className="admin-brand-info">
-            <h2>MaxMarket</h2>
+            <h2>MixZone</h2>
             <span>Admin Panel</span>
           </div>
         </div>
@@ -1006,7 +1006,7 @@ export default function AdminDashboard({
                 <div>
                   <h2 style={{ margin: '0 0 6px', fontSize: '1.4rem' }}>Menaxhimi i Produkteve</h2>
                   <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
-                    Shtoni, ndryshoni çmimet, ofertat ose fshini artikuj nga katalogu i MaxMarket.
+                    Shtoni, ndryshoni çmimet, ofertat ose fshini artikuj nga katalogu i MixZone.
                   </p>
                 </div>
 
@@ -1160,7 +1160,7 @@ export default function AdminDashboard({
                 <div>
                   <h2 style={{ margin: '0 0 4px', fontSize: '1.4rem' }}>Kategoritë e Dyqanit</h2>
                   <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
-                    Menaxhoni dhe shtoni kategori të reja për produktet e MaxMarket.
+                    Menaxhoni dhe shtoni kategori të reja për produktet e MixZone.
                   </p>
                 </div>
 

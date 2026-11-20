@@ -20,11 +20,11 @@ import AdminDashboard from './components/AdminDashboard';
 import { PRODUCTS as initialProducts, CATEGORIES } from './data';
 import { Sparkles, ArrowRight, PlusCircle, ShieldCheck, Edit3, Truck, LayoutDashboard } from 'lucide-react';
 
-const STORAGE_KEY = 'maxmarket_products_v3';
-const ORDERS_STORAGE_KEY = 'maxmarket_orders_list_v1';
-const CATEGORIES_STORAGE_KEY = 'maxmarket_categories_v3';
-const USER_STORAGE_KEY = 'maxmarket_auth_user_v2';
-const VIEW_MODE_STORAGE_KEY = 'maxmarket_auth_view_v2';
+const STORAGE_KEY = 'MixZone_products_v3';
+const ORDERS_STORAGE_KEY = 'MixZone_orders_list_v1';
+const CATEGORIES_STORAGE_KEY = 'MixZone_categories_v3';
+const USER_STORAGE_KEY = 'MixZone_auth_user_v2';
+const VIEW_MODE_STORAGE_KEY = 'MixZone_auth_view_v2';
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -226,14 +226,12 @@ function App() {
     });
   };
 
-  // Login Handler: Admin goes straight to Admin page immediately
+  // Login Handler: Show logo intro first, then go to admin or store
   const handleLoginSuccess = (user) => {
     if (user.role === 'admin') {
-      setCurrentUser(user);
-      setViewMode('admin');
-      setShowIntro(false);
-      setIsLoginIntro(false);
-      setLoginUser(null);
+      setLoginUser(user);
+      setIsLoginIntro(true);
+      setShowIntro(true);
       setIsAuthOpen(false);
       try {
         localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
@@ -525,7 +523,7 @@ function App() {
                   <span className="live-pulse-dot"></span>
                   <Truck size={20} className="banner-truck-icon" />
                   <span>
-                    <strong>Porosia juaj ({onTheWayOrderForBanner.orderId}) është Rrugës!</strong> Korrieri i MaxMarket po vjen drejt adresës tuaj.
+                    <strong>Porosia juaj ({onTheWayOrderForBanner.orderId}) është Rrugës!</strong> Korrieri i MixZone po vjen drejt adresës tuaj.
                   </span>
                 </div>
                 <button className="banner-view-btn">
@@ -553,6 +551,7 @@ function App() {
             />
 
             {/* 4 Category Cards Strip matching screenshot */}
+            <div id="categories-section">
             <CategoryCardsStrip 
               activeCategory={activeCategory}
               categories={categoriesList}
@@ -561,6 +560,7 @@ function App() {
                 setSearchQuery('');
               }}
             />
+            </div>
 
             {/* "Kategoritë" Section matching user request */}
             <section id="products-section" className="clean-favorites-section">
@@ -693,6 +693,7 @@ function App() {
           </main>
 
           {/* Clean Footer matching screenshot */}
+          <div id="footer-section">
           <Footer 
             categories={categoriesList}
             onSelectCategory={(catId) => {
@@ -700,6 +701,7 @@ function App() {
               setSearchQuery('');
             }} 
           />
+          </div>
         </>
       )}
 

@@ -195,7 +195,7 @@ export default function EditProductModal({
                       ))
                   ) : (
                     <>
-                      <option value="kuhinja">Kuhinja</option>
+                      <option value="kuhinja">Kuzhina</option>
                       <option value="organizim">Organizim & Ruajtje</option>
                       <option value="shtepia">Shtëpia</option>
                       <option value="pastrimi">Pastrimi</option>

@@ -51,8 +51,6 @@ export default function CleanHero({ onShopNow, onViewOffers }) {
 
           <div className="clean-hero-perks">
             <span className="perk-item">Dërgesë falas mbi 50 €</span>
-            <span className="perk-bullet">•</span>
-            <span className="perk-item">Kthim brenda 14 ditëve</span>
           </div>
         </div>
 
