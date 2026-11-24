@@ -1,7 +1,14 @@
 import React from 'react';
 import { ArrowRight, Sparkles, Leaf, Award, HeartHandshake } from 'lucide-react';
 
-export default function CleanHero({ onShopNow, onViewOffers }) {
+export default function CleanHero({ onShopNow, onViewOffers, settings = {} }) {
+  const heroBadge = settings.heroBadge || 'Koleksioni i Ri 2026 • MixZone';
+  const heroTitle = settings.heroTitle || 'Gjithçka thelbësore\npër një shtëpi';
+  const heroHighlight = settings.heroHighlight !== undefined ? settings.heroHighlight : 'me stil';
+  const heroSubtitle = settings.heroSubtitle || 'Cilësi e lartë. Praktike. Çmime të volitshme për çdo ditë në shtëpinë tuaj.';
+  const heroBtn1 = settings.heroBtn1 || 'Eksploro koleksionin';
+  const heroBtn2 = settings.heroBtn2 || 'Shiko ofertat';
+  const heroImage = settings.heroImage || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85';
   return (
     <section className="mz-hero">
       {/* ── 2D Abstract Creative Background Elements ── */}
@@ -41,26 +48,31 @@ export default function CleanHero({ onShopNow, onViewOffers }) {
           {/* Subtle creative pill chip */}
           <div className="mz-hero-pill-badge">
             <Sparkles size={14} className="pill-badge-icon" />
-            <span>Koleksioni i Ri 2026 • MixZone</span>
+            <span>{heroBadge}</span>
           </div>
 
           <h1 className="mz-hero-title">
-            Gjithçka thelbësore<br />
-            për një shtëpi <span className="mz-title-highlight">me stil</span>
+            {heroTitle.split('\n').map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                {idx < heroTitle.split('\n').length - 1 && <br />}
+              </React.Fragment>
+            ))}{' '}
+            {heroHighlight && <span className="mz-title-highlight">{heroHighlight}</span>}
           </h1>
 
           <p className="mz-hero-subtitle">
-            Cilësi e lartë. Praktike. Çmime të volitshme për çdo ditë në shtëpinë tuaj.
+            {heroSubtitle}
           </p>
 
           <div className="mz-hero-actions-row">
             <button className="mz-hero-btn mz-hero-primary" onClick={onShopNow}>
-              <span>Eksploro koleksionin</span>
+              <span>{heroBtn1}</span>
               <ArrowRight size={17} />
             </button>
 
             <button className="mz-hero-btn mz-hero-secondary" onClick={onViewOffers}>
-              <span>Shiko ofertat</span>
+              <span>{heroBtn2}</span>
             </button>
           </div>
 
@@ -87,7 +99,7 @@ export default function CleanHero({ onShopNow, onViewOffers }) {
             {/* Fresh modern lifestyle photo */}
             <div className="mz-image-frame">
               <img
-                src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85"
+                src={heroImage}
                 alt="Ambient modern dhe komod për shtëpi me stil"
                 className="mz-hero-img"
                 loading="eager"

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Save, Image as ImageIcon, Tag, FileText, DollarSign, Trash2, Edit3, Check } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Save, Image as ImageIcon, Tag, FileText, DollarSign, Trash2, Edit3, Check, Upload } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 const SAMPLE_IMAGES = [
@@ -45,6 +45,24 @@ export default function EditProductModal({
       setError('');
     }
   }, [product]);
+
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      if (file.size > 8 * 1024 * 1024) {
+        setError('Madhësia e fotos nuk duhet të kalojë 8MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setPhoto(event.target.result);
+        setError('');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (!isOpen || !product) return null;
 
@@ -226,18 +244,50 @@ export default function EditProductModal({
               </div>
             </div>
 
-            {/* Photo URL & Suggestions */}
+            {/* Photo Upload from PC (Browse) & Preview */}
             <div className="modern-form-group">
               <label className="modern-label">
-                <ImageIcon size={15} /> Foto e Produktit (URL)
+                <ImageIcon size={15} /> Foto e Produktit *
               </label>
-              <div className="modern-input-wrap">
+
+              {/* Browse from PC Button & Dropzone */}
+              <div 
+                className="modern-file-dropzone"
+                onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                title="Kliko për të zgjedhur foto nga kompjuteri"
+              >
                 <input
-                  type="url"
-                  className="modern-input no-icon"
-                  value={photo}
-                  onChange={(e) => setPhoto(e.target.value)}
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
                 />
+                <div className="dropzone-icon-circle">
+                  <Upload size={22} color="#ea580c" />
+                </div>
+                <div className="dropzone-text-group">
+                  <span className="dropzone-main-text">
+                    <strong>Zgjidh foto nga kompjuteri (Browse PC)</strong>
+                  </span>
+                  <span className="dropzone-sub-text">
+                    Kliko këtu për të ngarkuar foto nga PC (PNG, JPG, WEBP)
+                  </span>
+                </div>
+              </div>
+
+              {/* Optional URL input & Samples fallback */}
+              <div style={{ marginTop: '10px' }}>
+                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Ose shkruaj URL / zgjidh nga shembujt:</span>
+                <div className="modern-input-wrap" style={{ marginTop: '4px' }}>
+                  <input
+                    type="url"
+                    className="modern-input no-icon"
+                    placeholder="https://images.unsplash.com/photo-..."
+                    value={photo.startsWith('data:') ? '' : photo}
+                    onChange={(e) => setPhoto(e.target.value)}
+                  />
+                </div>
               </div>
 
               {/* Sample Images */}
@@ -262,12 +312,21 @@ export default function EditProductModal({
                     src={photo}
                     alt="Preview"
                     className="modern-img-thumbnail"
-                    onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <div className="preview-card-info">
+                  <div className="preview-card-info" style={{ flex: 1 }}>
                     <span className="preview-success-tag">✓ Foto e ngarkuar me sukses</span>
-                    <span className="preview-desc-tag">Kjo pamje reflektohet në katalog.</span>
+                    <span className="preview-desc-tag">
+                      {photo.startsWith('data:') ? 'Ngarkuar nga kompjuteri juaj (PC)' : 'Pamje e përzgjedhur'}
+                    </span>
                   </div>
+                  <button
+                    type="button"
+                    className="preview-remove-btn"
+                    onClick={() => setPhoto('')}
+                    title="Hiq foton"
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
             </div>

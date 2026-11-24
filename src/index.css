@@ -7022,6 +7022,73 @@ body {
   font-weight: 600;
 }
 
+/* PC Photo Browse & File Dropzone */
+.modern-file-dropzone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modern-file-dropzone:hover {
+  border-color: #ea580c;
+  background: #fff7ed;
+  transform: translateY(-1px);
+}
+
+.dropzone-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffedd5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dropzone-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropzone-main-text {
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+.dropzone-sub-text {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.preview-remove-btn {
+  background: #fee2e2;
+  border: none;
+  color: #dc2626;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: background 0.15s ease;
+  margin-left: 10px;
+}
+
+.preview-remove-btn:hover {
+  background: #fecaca;
+}
+
 /* Search bar pushed to the right */
 .mz-search-wrap {
   flex: 1;

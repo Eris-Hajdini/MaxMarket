@@ -25,6 +25,18 @@ const ORDERS_STORAGE_KEY = 'mixzone_orders_list_v2';
 const CATEGORIES_STORAGE_KEY = 'mixzone_categories_v5';
 const USER_STORAGE_KEY = 'mixzone_auth_user_v3';
 const VIEW_MODE_STORAGE_KEY = 'mixzone_auth_view_v3';
+const SITE_SETTINGS_STORAGE_KEY = 'mixzone_site_settings_v1';
+
+const DEFAULT_SITE_SETTINGS = {
+  topbarText: 'Dërgesa në të gjithë Kosovën • Kthime të thjeshta',
+  heroBadge: 'Koleksioni i Ri 2026 • MixZone',
+  heroTitle: 'Gjithçka thelbësore\npër një shtëpi',
+  heroHighlight: 'me stil',
+  heroSubtitle: 'Cilësi e lartë. Praktike. Çmime të volitshme për çdo ditë në shtëpinë tuaj.',
+  heroBtn1: 'Eksploro koleksionin',
+  heroBtn2: 'Shiko ofertat',
+  heroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85'
+};
 
 function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -64,6 +76,22 @@ function App() {
   const [storePage, setStorePage] = useState('home'); // 'home' (no products) or 'products' (all products)
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Site Settings for texts under header & first photo (managed in Admin Editing)
+  const [siteSettings, setSiteSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(SITE_SETTINGS_STORAGE_KEY);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return DEFAULT_SITE_SETTINGS;
+  });
+
+  const handleUpdateSiteSettings = (newSettings) => {
+    setSiteSettings(newSettings);
+    try {
+      localStorage.setItem(SITE_SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
+    } catch (e) {}
+  };
 
   // Persist user & view mode
   useEffect(() => {
@@ -448,6 +476,8 @@ function App() {
           orders={orders}
           categories={categoriesList}
           currentUser={currentUser}
+          siteSettings={siteSettings}
+          onUpdateSiteSettings={handleUpdateSiteSettings}
           onUpdateStatus={handleUpdateOrderStatus}
           onDeleteOrder={handleDeleteOrder}
           onUpdateTransport={handleUpdateTransport}
@@ -511,6 +541,7 @@ function App() {
             hasClientOrders={hasClientOrders}
             categories={categoriesList}
             searchQuery={searchQuery}
+            topbarText={siteSettings.topbarText}
             onSearchChange={setSearchQuery}
             activeCategory={activeCategory}
             currentPage={storePage}
@@ -552,6 +583,7 @@ function App() {
               <div className="mz-home-view">
                 {/* Clean Hero Section */}
                 <CleanHero 
+                  settings={siteSettings}
                   onShopNow={() => {
                     setActiveCategory('all');
                     setSearchQuery('');

@@ -11,6 +11,7 @@ export default function Navbar({
   hasClientOrders = false,
   categories = [],
   searchQuery = '',
+  topbarText = '',
   onSearchChange,
   onSelectCategory,
   activeCategory = 'all',
@@ -90,7 +91,7 @@ export default function Navbar({
       <div className="mz-topbar">
         <div className="mz-topbar-left">
           <Sparkles size={13} style={{ color: '#f59e0b' }} />
-          <span>Dërgesa në të gjithë Kosovën • Kthime të thjeshta</span>
+          <span>{topbarText || 'Dërgesa në të gjithë Kosovën • Kthime të thjeshta'}</span>
         </div>
         <div className="mz-topbar-right">
           {currentUser && !isAdmin && hasClientOrders && (

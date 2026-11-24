@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { HouseMLogo } from './BrandLogo';
 import {
   Home,
@@ -24,7 +24,8 @@ import {
   Sparkles,
   BarChart3,
   Plus,
-  Percent
+  Percent,
+  Upload
 } from 'lucide-react';
 import DiscountModal from './DiscountModal';
 import '../admin.css';
@@ -42,6 +43,8 @@ export default function AdminDashboard({
   orders,
   categories,
   currentUser,
+  siteSettings,
+  onUpdateSiteSettings,
   onUpdateStatus,
   onDeleteOrder,
   onUpdateTransport,
@@ -62,6 +65,54 @@ export default function AdminDashboard({
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [dateRange, setDateRange] = useState('Oct 1 – Oct 31, 2026');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+
+  // Editing state (Header texts & first photo)
+  const [editingForm, setEditingForm] = useState(() => ({
+    topbarText: siteSettings?.topbarText || 'Dërgesa në të gjithë Kosovën • Kthime të thjeshta',
+    heroBadge: siteSettings?.heroBadge || 'Koleksioni i Ri 2026 • MixZone',
+    heroTitle: siteSettings?.heroTitle || 'Gjithçka thelbësore\npër një shtëpi',
+    heroHighlight: siteSettings?.heroHighlight !== undefined ? siteSettings.heroHighlight : 'me stil',
+    heroSubtitle: siteSettings?.heroSubtitle || 'Cilësi e lartë. Praktike. Çmime të volitshme për çdo ditë në shtëpinë tuaj.',
+    heroBtn1: siteSettings?.heroBtn1 || 'Eksploro koleksionin',
+    heroBtn2: siteSettings?.heroBtn2 || 'Shiko ofertat',
+    heroImage: siteSettings?.heroImage || 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85'
+  }));
+
+  const [editingSavedToast, setEditingSavedToast] = useState(false);
+  const heroFileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (siteSettings) {
+      setEditingForm(prev => ({
+        ...prev,
+        ...siteSettings
+      }));
+    }
+  }, [siteSettings]);
+
+  const handleHeroFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      if (file.size > 8 * 1024 * 1024) {
+        alert('Madhësia e fotos nuk duhet të kalojë 8MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setEditingForm(prev => ({ ...prev, heroImage: event.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveEditing = (e) => {
+    if (e) e.preventDefault();
+    if (onUpdateSiteSettings) {
+      onUpdateSiteSettings(editingForm);
+    }
+    setEditingSavedToast(true);
+    setTimeout(() => setEditingSavedToast(false), 3000);
+  };
 
   // Discount modal state (Discounts are managed exclusively here)
   const [isDiscountModalOpen, setIsDiscountModalOpen] = useState(false);
@@ -337,6 +388,16 @@ export default function AdminDashboard({
             <div className="nav-item-left">
               <Boxes size={19} />
               <span>Inventory</span>
+            </div>
+          </button>
+
+          <button
+            className={`admin-nav-item ${activeTab === 'editing' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('editing'); setSidebarOpen(false); }}
+          >
+            <div className="nav-item-left">
+              <Edit3 size={19} />
+              <span>Editing</span>
             </div>
           </button>
 
@@ -1650,6 +1711,286 @@ export default function AdminDashboard({
               </div>
             );
           })()}
+
+          {/* TAB 8: EDITING (Site Content, First Photo & Header Texts) */}
+          {activeTab === 'editing' && (
+            <div className="dashboard-panel-card">
+              <div className="panel-header-row" style={{ alignItems: 'flex-start' }}>
+                <div>
+                  <h2 style={{ margin: '0 0 4px', fontSize: '1.4rem' }}>Editing & Përmbajtja e Faqes</h2>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
+                    Ndryshoni foton e parë dhe tekstet nën header të dyqanit MixZone.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  {editingSavedToast && (
+                    <span style={{ 
+                      background: '#dcfce7', 
+                      color: '#15803d', 
+                      padding: '6px 14px', 
+                      borderRadius: '8px', 
+                      fontSize: '0.85rem', 
+                      fontWeight: '600' 
+                    }}>
+                      ✓ U ruajtën me sukses!
+                    </span>
+                  )}
+                  <button 
+                    type="button" 
+                    className="add-product-main-btn"
+                    onClick={handleSaveEditing}
+                    style={{ margin: 0 }}
+                  >
+                    Ruaj Ndryshimet
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveEditing} style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '20px' }}>
+                {/* ── SEKSIONI 1: FOTOJA E PARË (HERO MAIN PHOTO) ── */}
+                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 4px', fontSize: '1.1rem', color: '#0f172a' }}>
+                    📸 Fotoja e Parë (Hero Photo)
+                  </h3>
+                  <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '0.85rem' }}>
+                    Kjo është fotografia e parë kryesore që shfaqet nën header në faqen kryesore.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 1fr) 240px', gap: '20px', alignItems: 'start' }}>
+                    <div>
+                      {/* Browse PC Button */}
+                      <div 
+                        className="modern-file-dropzone"
+                        onClick={() => heroFileInputRef.current && heroFileInputRef.current.click()}
+                        title="Kliko për të zgjedhur foto nga kompjuteri"
+                        style={{ cursor: 'pointer', marginBottom: '14px' }}
+                      >
+                        <input
+                          type="file"
+                          ref={heroFileInputRef}
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={handleHeroFileChange}
+                        />
+                        <div className="dropzone-icon-circle">
+                          <Upload size={22} color="#ea580c" />
+                        </div>
+                        <div className="dropzone-text-group">
+                          <span className="dropzone-main-text">
+                            <strong>Zgjidh foton nga kompjuteri (Browse PC)</strong>
+                          </span>
+                          <span className="dropzone-sub-text">
+                            Kliko këtu për të ngarkuar foto nga PC (PNG, JPG, WEBP)
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* URL input fallback */}
+                      <div>
+                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: '#475569', marginBottom: '4px' }}>
+                          Ose vendos URL-në e fotos:
+                        </label>
+                        <input
+                          type="text"
+                          className="modern-input no-icon"
+                          style={{ width: '100%' }}
+                          value={editingForm.heroImage?.startsWith('data:') ? '' : (editingForm.heroImage || '')}
+                          placeholder="https://images.unsplash.com/..."
+                          onChange={(e) => setEditingForm(prev => ({ ...prev, heroImage: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Live Preview Card */}
+                    <div style={{ textAlign: 'center' }}>
+                      <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: '600', color: '#64748b', marginBottom: '6px' }}>
+                        Pamja Paraprake (Preview):
+                      </span>
+                      <div style={{ 
+                        width: '100%', 
+                        height: '180px', 
+                        borderRadius: '12px', 
+                        overflow: 'hidden', 
+                        border: '2px solid #e2e8f0', 
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+                        background: '#fff'
+                      }}>
+                        <img 
+                          src={editingForm.heroImage} 
+                          alt="Hero Preview" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85'; }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        style={{
+                          marginTop: '8px',
+                          background: 'none',
+                          border: 'none',
+                          color: '#ea580c',
+                          fontSize: '0.8rem',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setEditingForm(prev => ({ ...prev, heroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85' }))}
+                      >
+                        Rivendos foton origjinale
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── SEKSIONI 2: TEKSTET NËN HEADER ── */}
+                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                  <h3 style={{ margin: '0 0 4px', fontSize: '1.1rem', color: '#0f172a' }}>
+                    ✍️ Tekstet Nën Header & Shiriti Kryesor
+                  </h3>
+                  <p style={{ margin: '0 0 16px', color: '#64748b', fontSize: '0.85rem' }}>
+                    Ndryshoni titullin kryesor, nëntitullin, etiketën dhe tekstet e butonave.
+                  </p>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    {/* Top Announcement Bar Text */}
+                    <div style={{ gridColumn: 'span 2' }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Teksti i Shiritit të Njoftimeve (Top Announcement Bar):
+                      </label>
+                      <input
+                        type="text"
+                        className="modern-input no-icon"
+                        style={{ width: '100%' }}
+                        value={editingForm.topbarText || ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, topbarText: e.target.value }))}
+                      />
+                    </div>
+
+                    {/* Hero Badge */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Etiketa / Badge e Koleksionit:
+                      </label>
+                      <input
+                        type="text"
+                        className="modern-input no-icon"
+                        style={{ width: '100%' }}
+                        value={editingForm.heroBadge || ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, heroBadge: e.target.value }))}
+                      />
+                    </div>
+
+                    {/* Hero Title Highlight Word */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Teksti i Theksuar me Ngjyrë (Highlight):
+                      </label>
+                      <input
+                        type="text"
+                        className="modern-input no-icon"
+                        style={{ width: '100%' }}
+                        value={editingForm.heroHighlight !== undefined ? editingForm.heroHighlight : ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, heroHighlight: e.target.value }))}
+                      />
+                    </div>
+
+                    {/* Hero Title */}
+                    <div style={{ gridColumn: 'span 2' }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Titulli Kryesor (Hero Title):
+                      </label>
+                      <textarea
+                        rows={2}
+                        className="modern-textarea"
+                        style={{ width: '100%' }}
+                        value={editingForm.heroTitle || ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, heroTitle: e.target.value }))}
+                      />
+                    </div>
+
+                    {/* Hero Subtitle */}
+                    <div style={{ gridColumn: 'span 2' }}>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Nëntitulli (Hero Subtitle):
+                      </label>
+                      <textarea
+                        rows={2}
+                        className="modern-textarea"
+                        style={{ width: '100%' }}
+                        value={editingForm.heroSubtitle || ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, heroSubtitle: e.target.value }))}
+                      />
+                    </div>
+
+                    {/* Button 1 Text */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Teksti i Butonit 1 (Eksploro):
+                      </label>
+                      <input
+                        type="text"
+                        className="modern-input no-icon"
+                        style={{ width: '100%' }}
+                        value={editingForm.heroBtn1 || ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, heroBtn1: e.target.value }))}
+                      />
+                    </div>
+
+                    {/* Button 2 Text */}
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '700', color: '#334155', marginBottom: '6px' }}>
+                        Teksti i Butonit 2 (Ofertat):
+                      </label>
+                      <input
+                        type="text"
+                        className="modern-input no-icon"
+                        style={{ width: '100%' }}
+                        value={editingForm.heroBtn2 || ''}
+                        onChange={(e) => setEditingForm(prev => ({ ...prev, heroBtn2: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Actions Row */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                  <button
+                    type="button"
+                    style={{
+                      background: '#f1f5f9',
+                      border: '1px solid #cbd5e1',
+                      color: '#475569',
+                      padding: '10px 20px',
+                      borderRadius: '8px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                      setEditingForm({
+                        topbarText: 'Dërgesa në të gjithë Kosovën • Kthime të thjeshta',
+                        heroBadge: 'Koleksioni i Ri 2026 • MixZone',
+                        heroTitle: 'Gjithçka thelbësore\npër një shtëpi',
+                        heroHighlight: 'me stil',
+                        heroSubtitle: 'Cilësi e lartë. Praktike. Çmime të volitshme për çdo ditë në shtëpinë tuaj.',
+                        heroBtn1: 'Eksploro koleksionin',
+                        heroBtn2: 'Shiko ofertat',
+                        heroImage: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85'
+                      });
+                    }}
+                  >
+                    Rivendos të Gjitha të Paracaktuarat
+                  </button>
+                  <button
+                    type="submit"
+                    className="add-product-main-btn"
+                    style={{ margin: 0, padding: '10px 28px' }}
+                  >
+                    Ruaj Ndryshimet
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
         </main>
       </div>
