@@ -61,6 +61,7 @@ function App() {
 
   const [isLoginIntro, setIsLoginIntro] = useState(false);
   const [loginUser, setLoginUser] = useState(null);
+  const [storePage, setStorePage] = useState('home'); // 'home' (no products) or 'products' (all products)
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -512,6 +513,8 @@ function App() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             activeCategory={activeCategory}
+            currentPage={storePage}
+            onNavigatePage={setStorePage}
             onSelectCategory={(catId) => {
               setActiveCategory(catId);
               setSearchQuery('');
@@ -544,142 +547,210 @@ function App() {
           )}
 
           <main>
-            {/* Clean Hero Section matching screenshot */}
-            <CleanHero 
-              onShopNow={() => {
-                setActiveCategory('all');
-                setSearchQuery('');
-                const el = document.getElementById('products-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-              onViewOffers={() => {
-                setActiveCategory('offers');
-                setSearchQuery('');
-                const el = document.getElementById('products-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
-            />
+            {storePage === 'home' ? (
+              /* ── HOME PAGE VIEW: HERO & CATEGORIES ONLY (NO PRODUCTS) ── */
+              <div className="mz-home-view">
+                {/* Clean Hero Section */}
+                <CleanHero 
+                  onShopNow={() => {
+                    setActiveCategory('all');
+                    setSearchQuery('');
+                    setStorePage('products');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  onViewOffers={() => {
+                    setActiveCategory('offers');
+                    setSearchQuery('');
+                    setStorePage('products');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
 
-            {/* 4 Category Cards Strip matching screenshot */}
-            <div id="categories-section">
-            <CategoryCardsStrip 
-              activeCategory={activeCategory}
-              categories={categoriesList}
-              onSelectCategory={(catId) => {
-                setActiveCategory(catId);
-                setSearchQuery('');
-              }}
-            />
-            </div>
-
-            {/* "Produktet" Section */}
-            <section id="products-section" className="mz-main-content mz-section-wrap">
-              <div className="mz-products-header">
-                <h2 className="mz-products-title">Produktet</h2>
-                {activeCategory !== 'all' ? (
-                  <button
-                    className="mz-products-viewall"
-                    onClick={() => {
-                      setActiveCategory('all');
+                {/* Categories Section */}
+                <div id="categories-section">
+                  <CategoryCardsStrip 
+                    activeCategory={activeCategory}
+                    categories={categoriesList}
+                    onSelectCategory={(catId) => {
+                      setActiveCategory(catId);
                       setSearchQuery('');
+                      setStorePage('products');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    title="Shfaq të gjitha produktet"
-                  >
-                    Shfaq të gjitha produktet ({productsList.length}) →
-                  </button>
-                ) : (
-                  <span className="mz-products-count-badge">
-                    {filteredProducts.length} produkte gjithsej
-                  </span>
-                )}
-              </div>
+                  />
+                </div>
 
-              {/* Filter Tabs - Only show categories */}
-              <div className="favorites-tabs-bar">
-                {categoriesList
-                  .filter((c) => c.id !== 'all' && c.id !== 'offers')
-                  .map((cat) => (
-                    <button
-                      key={cat.id}
-                      className={`favorites-tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                {/* Trust Features Strip */}
+                <TrustFeaturesStrip />
+              </div>
+            ) : (
+              /* ── DEDICATED PRODUCTS PAGE VIEW (ALL PRODUCTS & CATEGORY FILTERING) ── */
+              <div className="mz-products-page-view" id="products-section">
+                <section className="mz-main-content mz-section-wrap" style={{ paddingTop: '28px', paddingBottom: '40px' }}>
+                  {/* Breadcrumb / Back Navigation */}
+                  <div className="mz-page-nav-bar">
+                    <button 
+                      className="mz-back-link" 
                       onClick={() => {
-                        setActiveCategory(cat.id);
-                        setSearchQuery('');
+                        setStorePage('home');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
+                      title="Kthehu te Faqja Kryesore"
                     >
-                      {cat.name}
+                      ← Kthehu te Kreu
                     </button>
-                  ))}
-              </div>
-
-                {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}
-                {isAdmin && (
-                  <div className="admin-actions-bar">
-                    <div className="admin-badge-indicator">
-                      <ShieldCheck size={16} />
-                      <span>Paneli Admin</span>
+                    <div className="mz-page-breadcrumb">
+                      <span 
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => {
+                          setStorePage('home');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                      >
+                        MixZone
+                      </span>
+                      <span>/</span>
+                      <span className="current">Produktet</span>
+                      {activeCategory !== 'all' && (
+                        <>
+                          <span>/</span>
+                          <span className="current">
+                            {activeCategory === 'offers' 
+                              ? 'Ofertat' 
+                              : (categoriesList.find(c => c.id === activeCategory)?.name || activeCategory)}
+                          </span>
+                        </>
+                      )}
                     </div>
+                  </div>
 
-                    <button 
-                      className="add-product-main-btn"
-                      onClick={() => setIsAddProductOpen(true)}
-                      id="shto-produktin-btn"
+                  {/* Products Page Header Title & Subtitle */}
+                  <div className="mz-products-page-header">
+                    <div>
+                      <h1 className="mz-products-page-title">
+                        {activeCategory === 'all'
+                          ? 'Të gjitha produktet'
+                          : activeCategory === 'offers'
+                          ? 'Ofertat Speciale'
+                          : (categoriesList.find(c => c.id === activeCategory)?.name || 'Kategoria')}
+                      </h1>
+                      <p className="mz-products-page-subtitle">
+                        Shfletoni katalogun tonë cilësor për çdo kënd të shtëpisë tuaj.
+                      </p>
+                    </div>
+                    <div className="mz-products-count-badge">
+                      {filteredProducts.length} produkte gjithsej
+                    </div>
+                  </div>
+
+                  {/* Filter Tabs Bar (Të gjitha + all categories) */}
+                  <div className="favorites-tabs-bar" style={{ marginTop: '14px', marginBottom: '22px' }}>
+                    <button
+                      className={`favorites-tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
+                      onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
                     >
-                      <PlusCircle size={20} />
-                      <span>Shto Produktin+</span>
+                      Të gjitha ({productsList.length})
                     </button>
 
-                    <button 
-                      className="admin-edit-toggle-btn"
-                      onClick={() => setIsSelectorOpen(true)}
-                      id="admin-edit-btn"
-                      title="Shiko të gjitha produktet dhe zgjidh për editim"
-                    >
-                      <Edit3 size={18} />
-                      <span>Edit</span>
-                    </button>
-                  </div>
-                )}
+                    {categoriesList
+                      .filter((c) => c.id !== 'all' && c.id !== 'offers')
+                      .map((cat) => (
+                        <button
+                          key={cat.id}
+                          className={`favorites-tab-btn ${activeCategory === cat.id ? 'active' : ''}`}
+                          onClick={() => {
+                            setActiveCategory(cat.id);
+                            setSearchQuery('');
+                          }}
+                        >
+                          {cat.name}
+                        </button>
+                      ))}
 
-                {/* Live search active indicator */}
-                {searchQuery.trim() && (
-                  <div className="search-active-pill">
-                    <span>Rezultatet për: <strong>"{searchQuery}"</strong> ({filteredProducts.length} produkte)</span>
-                    <button onClick={() => setSearchQuery('')}>✕ Fshij kërkimin</button>
-                  </div>
-                )}
-
-                {/* Products Grid matching screenshot */}
-                {filteredProducts.length > 0 ? (
-                  <div className="clean-products-grid">
-                    {filteredProducts.map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                        isAdmin={isAdmin}
-                        isWishlisted={wishlist.some((item) => item.id === product.id)}
-                        onToggleWishlist={handleToggleWishlist}
-                        onAddToCart={handleAddToCart}
-                        onQuickView={(p) => setQuickViewProduct(p)}
-                        onEditProduct={(p) => setEditingProduct(p)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="clean-no-products">
-                    <p>Nuk u gjet asnjë produkt për këtë zgjedhje.</p>
-                    <button 
-                      className="clean-reset-filter-btn"
+                    <button
+                      className={`favorites-tab-btn ${activeCategory === 'offers' ? 'active' : ''}`}
                       onClick={() => {
-                        setActiveCategory('all');
+                        setActiveCategory('offers');
                         setSearchQuery('');
                       }}
                     >
-                      Shiko të gjitha produktet
+                      Ofertat
                     </button>
                   </div>
-                )}
-            </section>
+
+                  {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}
+                  {isAdmin && (
+                    <div className="admin-actions-bar">
+                      <div className="admin-badge-indicator">
+                        <ShieldCheck size={16} />
+                        <span>Paneli Admin</span>
+                      </div>
+
+                      <button 
+                        className="add-product-main-btn"
+                        onClick={() => setIsAddProductOpen(true)}
+                        id="shto-produktin-btn"
+                      >
+                        <PlusCircle size={20} />
+                        <span>Shto Produktin+</span>
+                      </button>
+
+                      <button 
+                        className="admin-edit-toggle-btn"
+                        onClick={() => setIsSelectorOpen(true)}
+                        id="admin-edit-btn"
+                        title="Shiko të gjitha produktet dhe zgjidh për editim"
+                      >
+                        <Edit3 size={18} />
+                        <span>Edit</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Live search active indicator */}
+                  {searchQuery.trim() && (
+                    <div className="search-active-pill">
+                      <span>Rezultatet për: <strong>"{searchQuery}"</strong> ({filteredProducts.length} produkte)</span>
+                      <button onClick={() => setSearchQuery('')}>✕ Fshij kërkimin</button>
+                    </div>
+                  )}
+
+                  {/* Products Grid */}
+                  {filteredProducts.length > 0 ? (
+                    <div className="clean-products-grid">
+                      {filteredProducts.map((product) => (
+                        <ProductCard
+                          key={product.id}
+                          product={product}
+                          isAdmin={isAdmin}
+                          isWishlisted={wishlist.some((item) => item.id === product.id)}
+                          onToggleWishlist={handleToggleWishlist}
+                          onAddToCart={handleAddToCart}
+                          onQuickView={(p) => setQuickViewProduct(p)}
+                          onEditProduct={(p) => setEditingProduct(p)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="clean-no-products">
+                      <p>Nuk u gjet asnjë produkt për këtë zgjedhje.</p>
+                      <button 
+                        className="clean-reset-filter-btn"
+                        onClick={() => {
+                          setActiveCategory('all');
+                          setSearchQuery('');
+                        }}
+                      >
+                        Shfaq të gjitha produktet ({productsList.length})
+                      </button>
+                    </div>
+                  )}
+                </section>
+
+                {/* Trust Features Strip */}
+                <TrustFeaturesStrip />
+              </div>
+            )}
           </main>
 
           {/* Footer */}
@@ -688,6 +759,8 @@ function App() {
             onSelectCategory={(catId) => {
               setActiveCategory(catId);
               setSearchQuery('');
+              setStorePage('products');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }} 
           />
         </>

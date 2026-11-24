@@ -14,6 +14,8 @@ export default function Navbar({
   onSearchChange,
   onSelectCategory,
   activeCategory = 'all',
+  currentPage = 'home',
+  onNavigatePage,
   onOpenCart,
   onOpenWishlist,
   onOpenOrders,
@@ -38,29 +40,39 @@ export default function Navbar({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // When clicking Logo: scroll upfront to the very top
+  // When clicking Logo: return to Home page and scroll upfront to the very top
   const handleLogoClick = () => {
+    setMobileMenuOpen(false);
+    if (onNavigatePage) onNavigatePage('home');
     if (onSelectCategory) onSelectCategory('all');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Scroll to Categories section
+  // Categories click: go to Home and scroll to Categories section
   const handleScrollToCategories = () => {
     setMobileMenuOpen(false);
-    const el = document.getElementById('categories-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (currentPage !== 'home' && onNavigatePage) {
+      onNavigatePage('home');
+      setTimeout(() => {
+        const el = document.getElementById('categories-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 50);
+    } else {
+      const el = document.getElementById('categories-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   };
 
-  // Scroll to Products section - when pressed, reset to all products and scroll down
-  const handleScrollToProducts = () => {
+  // Products click: go to dedicated Products page with all products
+  const handleGoToProducts = () => {
     setMobileMenuOpen(false);
     if (onSelectCategory) onSelectCategory('all');
-    const el = document.getElementById('products-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (onNavigatePage) onNavigatePage('products');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Scroll to Contact / Footer section
@@ -114,15 +126,15 @@ export default function Navbar({
           {/* 3 Main Header Links: Categories, Products, Contact */}
           <nav className="mz-unified-nav" aria-label="Main Navigation">
             <button
-              className="mz-nav-link"
+              className={`mz-nav-link ${currentPage === 'home' ? 'active' : ''}`}
               onClick={handleScrollToCategories}
               title="Categories"
             >
               Categories
             </button>
             <button
-              className="mz-nav-link"
-              onClick={handleScrollToProducts}
+              className={`mz-nav-link ${currentPage === 'products' ? 'active' : ''}`}
+              onClick={handleGoToProducts}
               title="Products"
             >
               Products
@@ -147,9 +159,8 @@ export default function Navbar({
               value={searchQuery}
               onChange={(e) => {
                 if (onSearchChange) onSearchChange(e.target.value);
-                if (e.target.value.trim().length > 1) {
-                  const el = document.getElementById('products-section');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                if (e.target.value.trim().length > 0 && currentPage !== 'products' && onNavigatePage) {
+                  onNavigatePage('products');
                 }
               }}
             />
@@ -203,7 +214,7 @@ export default function Navbar({
         <div className="mz-mobile-menu">
           <button className="mz-catlink" onClick={handleLogoClick}>Home (Upfront)</button>
           <button className="mz-catlink" onClick={handleScrollToCategories}>Categories</button>
-          <button className="mz-catlink" onClick={handleScrollToProducts}>Products</button>
+          <button className="mz-catlink" onClick={handleGoToProducts}>Products</button>
           <button className="mz-catlink" onClick={handleScrollToContact}>Contact</button>
           <hr style={{ margin: '8px 16px', border: 'none', borderTop: '1px solid #f1f1f1' }} />
           {!currentUser ? (
