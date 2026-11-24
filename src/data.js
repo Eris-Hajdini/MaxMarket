@@ -1,10 +1,11 @@
 export const CATEGORIES = [
   { id: 'all', name: 'Kreu', icon: 'Sparkles', count: 24 },
   { id: 'kitchen', name: 'Kuzhina', icon: 'UtensilsCrossed', count: 8 },
-  { id: 'home', name: 'Shtëpia', icon: 'Lamp', count: 6 },
-  { id: 'storage', name: 'Organizim', icon: 'Package', count: 7 },
+  { id: 'storage', name: 'Organizim & Ruajtje', icon: 'Package', count: 7 },
   { id: 'cleaning', name: 'Pastrimi', icon: 'Sparkles', count: 4 },
+  { id: 'dining', name: 'Tavolina & Servirje', icon: 'Utensils', count: 5 },
   { id: 'decor', name: 'Dekori', icon: 'Sparkles', count: 5 },
+  { id: 'home', name: 'Shtëpia', icon: 'Lamp', count: 6 },
   { id: 'offers', name: 'Ofertat', icon: 'Flame', count: 6, badge: 'Deri -40%' }
 ];
 

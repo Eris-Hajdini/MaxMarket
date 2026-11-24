@@ -27,7 +27,8 @@ export default function EditProductModal({
   const [stock, setStock] = useState('50');
   const [description, setDescription] = useState('');
   const [photo, setPhoto] = useState('');
-  const [category, setCategory] = useState('kuhinja');
+  const availableCategories = (categories || []).filter(c => c.id !== 'all' && c.id !== 'offers');
+  const [category, setCategory] = useState(availableCategories[0]?.id || 'kitchen');
   const [badge, setBadge] = useState('');
   const [error, setError] = useState('');
 
@@ -38,7 +39,7 @@ export default function EditProductModal({
       setStock(product.stock !== undefined ? product.stock.toString() : '50');
       setDescription(product.description || '');
       setPhoto(product.image || '');
-      setCategory(product.category || 'kuhinja');
+      setCategory(product.category || availableCategories[0]?.id || 'kitchen');
       // If badge starts with '-' or is a discount, we leave it or allow non-discount badges
       setBadge(product.badge || '');
       setError('');

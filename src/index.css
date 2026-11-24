@@ -6889,25 +6889,25 @@ body {
 .mz-unified-nav {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-left: 12px;
+  gap: 6px;
+  margin-left: 18px;
 }
 .mz-nav-link {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #374151;
-  padding: 8px 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+  padding: 8px 15px;
   border-radius: 8px;
   position: relative;
   transition: all 0.15s ease;
   white-space: nowrap;
 }
 .mz-nav-link:hover {
-  color: #111827;
-  background: #f3f4f6;
+  color: #ea580c;
+  background: #fff7ed;
 }
 .mz-nav-link.active {
   color: #ea580c;

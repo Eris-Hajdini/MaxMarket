@@ -38,40 +38,43 @@ export default function Navbar({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Standard Albanian categories mapping
-  const albanianCategories = [
-    { id: 'kitchen', name: 'Kuzhina' },
-    { id: 'home', name: 'Shtëpia' },
-    { id: 'storage', name: 'Organizim' },
-    { id: 'cleaning', name: 'Pastrimi' },
-    { id: 'decor', name: 'Dekori' },
-    { id: 'offers', name: 'Ofertat' }
-  ];
+  // When clicking Logo: scroll upfront to the very top
+  const handleLogoClick = () => {
+    if (onSelectCategory) onSelectCategory('all');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  const navLinks = (categories && categories.length > 0
-    ? categories.filter(c => c.id !== 'all').map(c => {
-        // Map common IDs to clean Albanian names
-        if (c.id === 'kitchen' || c.id === 'kuhinja') return { ...c, name: 'Kuzhina' };
-        if (c.id === 'home' || c.id === 'shtepia') return { ...c, name: 'Shtëpia' };
-        if (c.id === 'storage' || c.id === 'organizim') return { ...c, name: 'Organizim' };
-        if (c.id === 'cleaning' || c.id === 'pastrimi') return { ...c, name: 'Pastrimi' };
-        if (c.id === 'decor') return { ...c, name: 'Dekori' };
-        if (c.id === 'offers') return { ...c, name: 'Ofertat' };
-        return c;
-      })
-    : albanianCategories
-  );
-
-  const handleCategoryClick = (catId) => {
-    if (onSelectCategory) onSelectCategory(catId);
+  // Scroll to Categories section
+  const handleScrollToCategories = () => {
     setMobileMenuOpen(false);
+    const el = document.getElementById('categories-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Scroll to Products section - when pressed, reset to all products and scroll down
+  const handleScrollToProducts = () => {
+    setMobileMenuOpen(false);
+    if (onSelectCategory) onSelectCategory('all');
     const el = document.getElementById('products-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Scroll to Contact / Footer section
+  const handleScrollToContact = () => {
+    setMobileMenuOpen(false);
+    const el = document.getElementById('footer-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
     <header className="mz-header">
-      {/* ── Top Announcement Bar (Free delivery removed, Albanian text) ── */}
+      {/* ── Top Announcement Bar ── */}
       <div className="mz-topbar">
         <div className="mz-topbar-left">
           <Sparkles size={13} style={{ color: '#f59e0b' }} />
@@ -92,42 +95,45 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* ── Unified Single Header Bar: Logo | Category Nav Links | Search (Right) | Icons ── */}
+      {/* ── Unified Single Header Bar: Logo (Upfront) | Categories, Products, Contacts | Search (Right) | Icons ── */}
       <div className="mz-mainbar">
         <div className="mz-mainbar-inner">
-          {/* Mobile menu hamburger toggle */}
+          {/* Mobile hamburger menu toggle */}
           <button className="mz-mobile-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          {/* Logo on Left */}
-          <div className="mz-logo-wrap">
+          {/* Logo on Left - Clicking goes upfront to the top */}
+          <div className="mz-logo-wrap" title="Kthehu në fillim (Upfront)">
             <BrandLogo
               size={36}
-              onClick={() => {
-                if (onSelectCategory) onSelectCategory('all');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onClick={handleLogoClick}
             />
           </div>
 
-          {/* Unified Category Navigation Links directly inside Header */}
-          <nav className="mz-unified-nav" aria-label="Kategoritë kryesore">
+          {/* 3 Main Header Links: Categories, Products, Contact */}
+          <nav className="mz-unified-nav" aria-label="Main Navigation">
             <button
-              className={`mz-nav-link ${activeCategory === 'all' ? 'active' : ''}`}
-              onClick={() => handleCategoryClick('all')}
+              className="mz-nav-link"
+              onClick={handleScrollToCategories}
+              title="Categories"
             >
-              Kreu
+              Categories
             </button>
-            {navLinks.map(cat => (
-              <button
-                key={cat.id}
-                className={`mz-nav-link ${activeCategory === cat.id ? 'active' : ''} ${cat.id === 'offers' ? 'offers' : ''}`}
-                onClick={() => handleCategoryClick(cat.id)}
-              >
-                {cat.name}
-              </button>
-            ))}
+            <button
+              className="mz-nav-link"
+              onClick={handleScrollToProducts}
+              title="Products"
+            >
+              Products
+            </button>
+            <button
+              className="mz-nav-link"
+              onClick={handleScrollToContact}
+              title="Contact"
+            >
+              Contact
+            </button>
           </nav>
 
           {/* Search bar pushed to the right */}
@@ -195,12 +201,11 @@ export default function Navbar({
       {/* ── Mobile menu drawer ── */}
       {mobileMenuOpen && (
         <div className="mz-mobile-menu">
-          <button className={`mz-catlink ${activeCategory === 'all' ? 'active' : ''}`} onClick={() => handleCategoryClick('all')}>Kreu</button>
-          {navLinks.map(cat => (
-            <button key={cat.id} className={`mz-catlink ${activeCategory === cat.id ? 'active' : ''} ${cat.id === 'offers' ? 'offers' : ''}`} onClick={() => handleCategoryClick(cat.id)}>
-              {cat.name}
-            </button>
-          ))}
+          <button className="mz-catlink" onClick={handleLogoClick}>Home (Upfront)</button>
+          <button className="mz-catlink" onClick={handleScrollToCategories}>Categories</button>
+          <button className="mz-catlink" onClick={handleScrollToProducts}>Products</button>
+          <button className="mz-catlink" onClick={handleScrollToContact}>Contact</button>
+          <hr style={{ margin: '8px 16px', border: 'none', borderTop: '1px solid #f1f1f1' }} />
           {!currentUser ? (
             <button className="mz-catlink" onClick={() => { setMobileMenuOpen(false); onOpenAuth && onOpenAuth(); }}>Hyr / Regjistrohu</button>
           ) : (

@@ -13,14 +13,21 @@ const SAMPLE_IMAGES = [
 const PRESET_BADGES = ['E Re', 'Top Brend', 'Më e Shitura', 'Koleksion i Ri', 'Ekskluzive'];
 
 export default function AddProductModal({ isOpen = true, onClose, onAddProduct, categories = [] }) {
+  const availableCategories = categories.filter(c => c.id !== 'all' && c.id !== 'offers');
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [stock, setStock] = useState('50');
   const [description, setDescription] = useState('');
   const [photo, setPhoto] = useState('');
-  const [category, setCategory] = useState(categories.find(c => c.id !== 'all' && c.id !== 'offers')?.id || 'kuhinja');
+  const [category, setCategory] = useState(availableCategories[0]?.id || 'kitchen');
   const [badge, setBadge] = useState('E Re');
   const [error, setError] = useState('');
+
+  React.useEffect(() => {
+    if ((!category || !availableCategories.some(c => c.id === category)) && availableCategories.length > 0) {
+      setCategory(availableCategories[0].id);
+    }
+  }, [categories]);
 
   if (!isOpen) return null;
 

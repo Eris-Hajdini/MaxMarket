@@ -386,10 +386,20 @@ function App() {
     if (activeCategory === 'offers') {
       matchesCategory = p.oldPrice !== null;
     } else if (activeCategory !== 'all') {
+      const pCat = String(p.category || '').toLowerCase().trim();
+      const aCat = String(activeCategory || '').toLowerCase().trim();
       matchesCategory = 
-        p.category === activeCategory || 
-        (activeCategory === 'kuhinja' && (p.category === 'kitchen' || p.category === 'kuzhine')) ||
-        (activeCategory === 'shtepia' && (p.category === 'decor' || p.category === 'bedding'));
+        pCat === aCat || 
+        (aCat === 'kitchen' && (pCat === 'kuhinja' || pCat === 'kuzhine' || pCat === 'kuzhina')) ||
+        (aCat === 'kuhinja' && (pCat === 'kitchen' || pCat === 'kuzhine' || pCat === 'kuzhina')) ||
+        (aCat === 'storage' && (pCat === 'organizim' || pCat === 'ruajtje')) ||
+        (aCat === 'organizim' && (pCat === 'storage' || pCat === 'ruajtje')) ||
+        (aCat === 'cleaning' && (pCat === 'pastrimi' || pCat === 'pastrim')) ||
+        (aCat === 'pastrimi' && (pCat === 'cleaning' || pCat === 'pastrim')) ||
+        (aCat === 'dining' && (pCat === 'tavolina' || pCat === 'servirje')) ||
+        (aCat === 'decor' && (pCat === 'shtepia' || pCat === 'home' || pCat === 'dekor')) ||
+        (aCat === 'home' && (pCat === 'shtepia' || pCat === 'decor' || pCat === 'dekor')) ||
+        (aCat === 'shtepia' && (pCat === 'decor' || pCat === 'bedding' || pCat === 'home'));
     }
 
     let matchesSearch = true;
@@ -562,30 +572,30 @@ function App() {
             />
             </div>
 
-            {/* "Produktet më të pëlqyera" Section */}
+            {/* "Produktet" Section */}
             <section id="products-section" className="mz-main-content mz-section-wrap">
               <div className="mz-products-header">
-                <h2 className="mz-products-title">Produktet më të pëlqyera</h2>
-                <button
-                  className="mz-products-viewall"
-                  onClick={() => {
-                    setActiveCategory('all');
-                    setSearchQuery('');
-                  }}
-                >
-                  Shiko të gjitha →
-                </button>
+                <h2 className="mz-products-title">Produktet</h2>
+                {activeCategory !== 'all' ? (
+                  <button
+                    className="mz-products-viewall"
+                    onClick={() => {
+                      setActiveCategory('all');
+                      setSearchQuery('');
+                    }}
+                    title="Shfaq të gjitha produktet"
+                  >
+                    Shfaq të gjitha produktet ({productsList.length}) →
+                  </button>
+                ) : (
+                  <span className="mz-products-count-badge">
+                    {filteredProducts.length} produkte gjithsej
+                  </span>
+                )}
               </div>
 
-              {/* Filter Tabs */}
+              {/* Filter Tabs - Only show categories */}
               <div className="favorites-tabs-bar">
-                <button
-                  className={`favorites-tab-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                  onClick={() => { setActiveCategory('all'); setSearchQuery(''); }}
-                >
-                  Të gjitha
-                </button>
-
                 {categoriesList
                   .filter((c) => c.id !== 'all' && c.id !== 'offers')
                   .map((cat) => (
@@ -600,16 +610,6 @@ function App() {
                       {cat.name}
                     </button>
                   ))}
-
-                <button
-                  className={`favorites-tab-btn ${activeCategory === 'offers' ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveCategory('offers');
-                    setSearchQuery('');
-                  }}
-                >
-                  Ofertat
-                </button>
               </div>
 
                 {/* ADMIN ACTIONS: Shto Produktin+ & Edit Options */}

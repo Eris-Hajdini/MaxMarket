@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Truck, Headphones } from 'lucide-react';
+import { ShieldCheck, Truck, Headphones, Phone, Mail, MapPin, Clock } from 'lucide-react';
 import BrandLogo from './BrandLogo';
 
 export default function Footer({ onSelectCategory, categories = [] }) {
@@ -9,13 +9,16 @@ export default function Footer({ onSelectCategory, categories = [] }) {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const dynamicCategories = [
-    { id: 'kitchen', name: 'Kuzhina' },
-    { id: 'storage', name: 'Organizim & Ruajtje' },
-    { id: 'home', name: 'Shtëpia & Jetesa' },
-    { id: 'cleaning', name: 'Pastrimi' },
-    { id: 'decor', name: 'Dekori' }
-  ];
+  const dynamicCategories = categories && categories.length > 0
+    ? categories.filter(c => c.id !== 'all' && c.id !== 'offers')
+    : [
+        { id: 'kitchen', name: 'Kuzhina' },
+        { id: 'storage', name: 'Organizim & Ruajtje' },
+        { id: 'cleaning', name: 'Pastrimi' },
+        { id: 'dining', name: 'Tavolina & Servirje' },
+        { id: 'decor', name: 'Dekori' },
+        { id: 'home', name: 'Shtëpia' }
+      ];
 
   return (
     <footer className="mz-footer" id="footer-section">
@@ -33,12 +36,12 @@ export default function Footer({ onSelectCategory, categories = [] }) {
         <div className="mz-trust-divider" />
         <div className="mz-trust-item">
           <Headphones size={26} strokeWidth={1.8} style={{ color: '#2563eb' }} />
-          <span>Kujdesi ndaj klientit</span>
+          <span>Kujdesi ndaj klientit 24/7</span>
         </div>
       </div>
 
       {/* ── Main Footer Columns ── */}
-      <div className="mz-footer-main">
+      <div className="mz-footer-main" style={{ gridTemplateColumns: '1.4fr 1fr 1fr 1.2fr' }}>
         <div className="mz-footer-brand">
           <BrandLogo size={32} />
           <p className="mz-footer-brand-desc">
@@ -63,7 +66,28 @@ export default function Footer({ onSelectCategory, categories = [] }) {
             <li><button onClick={() => alert('Dërgesa në të gjithë Kosovën brenda 24-48 orëve.')}>Dërgesa në Kosovë</button></li>
             <li><button onClick={() => alert('Kthimi i produkteve pranohet me thjeshtësi.')}>Politika e kthimit</button></li>
             <li><button onClick={() => alert('Pagesa bëhet me para në dorë gjatë marrjes së porosisë (Cash on Delivery).')}>Mënyra e pagesës</button></li>
-            <li><button onClick={() => alert('Tel: +383 44 123 456 | Email: info@mixzone-ks.com')}>Na kontaktoni</button></li>
+          </ul>
+        </div>
+
+        <div className="mz-footer-col" id="contact-info">
+          <h4 className="mz-footer-heading">Kontakt</h4>
+          <ul className="mz-footer-links" style={{ gap: '10px' }}>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+              <Phone size={15} style={{ color: '#ea580c', flexShrink: 0 }} />
+              <span>+383 44 123 456</span>
+            </li>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+              <Mail size={15} style={{ color: '#ea580c', flexShrink: 0 }} />
+              <span>info@mixzone-ks.com</span>
+            </li>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+              <MapPin size={15} style={{ color: '#ea580c', flexShrink: 0 }} />
+              <span>Prishtinë, Kosovë</span>
+            </li>
+            <li style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.9rem' }}>
+              <Clock size={15} style={{ color: '#ea580c', flexShrink: 0 }} />
+              <span>E Hënë – E Shtunë: 08:00 – 20:00</span>
+            </li>
           </ul>
         </div>
       </div>

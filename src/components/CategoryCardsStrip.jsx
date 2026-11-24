@@ -1,6 +1,15 @@
 import React from 'react';
 
-const CATEGORY_ITEMS = [
+const DEFAULT_CATEGORY_IMAGES = {
+  kitchen: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80',
+  storage: 'https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=800&q=80',
+  cleaning: 'https://images.unsplash.com/photo-1585421514738-01798e348b17?auto=format&fit=crop&w=800&q=80',
+  dining: 'https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=800&q=80',
+  decor: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80',
+  home: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=800&q=80'
+};
+
+const FALLBACK_ITEMS = [
   {
     id: 'kitchen',
     title: 'Kuzhina',
@@ -35,6 +44,19 @@ export default function CategoryCardsStrip({ onSelectCategory, activeCategory, c
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Build items from active categoriesList if provided
+  const validCategories = Array.isArray(categories) 
+    ? categories.filter((c) => c.id !== 'all' && c.id !== 'offers')
+    : [];
+
+  const items = validCategories.length > 0
+    ? validCategories.map((c) => ({
+        id: c.id,
+        title: c.name,
+        image: c.image || DEFAULT_CATEGORY_IMAGES[c.id] || DEFAULT_CATEGORY_IMAGES.kitchen
+      }))
+    : FALLBACK_ITEMS;
+
   return (
     <section className="mz-cats-section" id="categories-section">
       <div className="mz-cats-header">
@@ -47,16 +69,16 @@ export default function CategoryCardsStrip({ onSelectCategory, activeCategory, c
             if (el) el.scrollIntoView({ behavior: 'smooth' });
           }}
         >
-          Shiko të gjitha →
+          Shiko të gjitha produktet →
         </button>
       </div>
       <div className="mz-cats-grid">
-        {CATEGORY_ITEMS.map((card) => {
+        {items.map((card) => {
           const isSelected = activeCategory === card.id ||
-            (card.id === 'kitchen' && activeCategory === 'kuhinja') ||
+            (card.id === 'kitchen' && (activeCategory === 'kuhinja' || activeCategory === 'kuzhine')) ||
             (card.id === 'storage' && activeCategory === 'organizim') ||
             (card.id === 'cleaning' && activeCategory === 'pastrimi') ||
-            (card.id === 'decor' && activeCategory === 'shtepia');
+            (card.id === 'decor' && (activeCategory === 'shtepia' || activeCategory === 'home'));
 
           return (
             <div
